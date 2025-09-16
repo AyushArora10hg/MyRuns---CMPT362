@@ -11,4 +11,6 @@
     <string name="radioButton1">Male</string>
     <string name="radioButton2">Female</string>
     <string name="majorHint">eg. computing science</string>
+    <string name="button1">Save</string>
+    <string name="button2">Cancel</string>
 </resources>
