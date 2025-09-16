@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ayush_Arora_MyRuns1</string>
+    <string name="app_name">MyRuns</string>
     <string name="nameViewText">Name: </string>
     <string name="emailViewText">"Email: "</string>
     <string name="phoneNumberViewText">"Phone Number: "</string>
@@ -13,4 +13,5 @@
     <string name="majorHint">eg. computing science</string>
     <string name="button1">Save</string>
     <string name="button2">Cancel</string>
+    <string name="photoViewText">"Profile Photo: "</string>
 </resources>
