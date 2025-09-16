@@ -37,6 +37,31 @@
             android:layout_marginBottom="10dp"
             android:text="@string/photoViewText" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="80dp"
+            android:padding="20dp">
+
+            <ImageView
+                android:id="@+id/imageProfile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginEnd="15dp">
+            </ImageView>
+
+            <Button
+                android:id="@+id/cameraButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/cameraButton"
+                android:layout_gravity="center_vertical">
+            </Button>
+        </LinearLayout>
+
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
@@ -86,22 +111,6 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/majorTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/majorViewText" />
-
-        <EditText
-            android:id="@+id/majorEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="none"
-            android:hint="@string/majorHint"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:layout_marginBottom="10dp" />
-
-        <TextView
             android:id="@+id/genderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -127,6 +136,22 @@
                 android:text="@string/radioButton2"/>
 
         </RadioGroup>
+
+        <TextView
+            android:id="@+id/majorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/majorViewText" />
+
+        <EditText
+            android:id="@+id/majorEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="none"
+            android:hint="@string/majorHint"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:layout_marginBottom="10dp" />
 
         <LinearLayout
             style="?android:attr/buttonBarStyle"
