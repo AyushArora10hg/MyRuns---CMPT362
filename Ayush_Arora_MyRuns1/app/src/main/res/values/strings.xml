@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Ayush_Arora_MyRuns1</string>
+    <string name="nameViewText">Name: </string>
+    <string name="emailViewText">"Email: "</string>
+    <string name="phoneNumberViewText">"Phone Number: "</string>
+    <string name="genderViewText">"Gender: "</string>
+    <string name="majorViewText">"Major: "</string>
+    <string name="nameHint">eg. Ayush Arora</string>
+    <string name="emailHint">eg. ayusharora@xyz.com</string>
+    <string name="phoneNumberHint">eg. 111-222-3456</string>
+    <string name="radioButton1">Male</string>
+    <string name="radioButton2">Female</string>
+    <string name="majorHint">eg. computing science</string>
 </resources>
