@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="@string/app_name"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="start"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="10dp" />
+
+<ScrollView
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="10dp"
     tools:context=".UserProfileActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/appNameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/app_name"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_gravity="start"
-            android:layout_marginTop="10dp" />
-
-        <View
-            android:id="@+id/headingLine"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="10dp" />
-
-        <TextView
-            android:id="@+id/photoTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -63,7 +67,6 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/nameViewText" />
@@ -79,7 +82,6 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/emailTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/emailViewText" />
@@ -95,7 +97,6 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/phoneNumberTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/phoneNumberViewText" />
@@ -111,7 +112,6 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/genderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/genderViewText" />
@@ -123,22 +123,21 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/maleRadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/radioButton1"
-                android:layout_marginEnd="50dp"/>
-
-            <RadioButton
                 android:id="@+id/femaleRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="@string/radioButton2"/>
+                android:text="@string/femaleRadioButton"
+                android:layout_marginEnd="50dp"/>
+
+            <RadioButton
+                android:id="@+id/maleRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/maleRadioButton"/>
 
         </RadioGroup>
 
         <TextView
-            android:id="@+id/classTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/classViewText" />
@@ -154,7 +153,6 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/majorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/majorViewText" />
@@ -200,3 +198,5 @@
     </LinearLayout>
 
 </ScrollView>
+
+</LinearLayout>

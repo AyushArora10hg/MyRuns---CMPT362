@@ -8,8 +8,8 @@
     <string name="nameHint">eg. Ayush Arora</string>
     <string name="emailHint">eg. ayusharora@xyz.com</string>
     <string name="phoneNumberHint">eg. 111-222-3456</string>
-    <string name="radioButton1">Female</string>
-    <string name="radioButton2">Male</string>
+    <string name="femaleRadioButton">Female</string>
+    <string name="maleRadioButton">Male</string>
     <string name="majorHint">eg. computing science</string>
     <string name="button1">Save</string>
     <string name="button2">Cancel</string>
