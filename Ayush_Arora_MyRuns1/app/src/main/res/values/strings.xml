@@ -15,4 +15,6 @@
     <string name="button2">Cancel</string>
     <string name="photoViewText">"Profile Photo: "</string>
     <string name="cameraButtonText">Change</string>
+    <string name="classViewText">"Class: "</string>
+    <string name="classHint">eg. 2023</string>
 </resources>
