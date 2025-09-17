@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="@string/cameraButtonText"
+                android:textStyle="bold"
                 android:background="@drawable/square"
                 android:textColor="@android:color/white"
                 android:layout_gravity="center_vertical" />
@@ -181,6 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/button1"
+                android:textStyle="bold"
                 android:backgroundTint="@android:color/darker_gray"
                 android:background="@drawable/square"
                 android:textColor="@android:color/white"
@@ -191,6 +193,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/button2"
+                android:textStyle="bold"
                 android:backgroundTint="@android:color/darker_gray"
                 android:background="@drawable/square"
                 android:textColor="@android:color/white"
