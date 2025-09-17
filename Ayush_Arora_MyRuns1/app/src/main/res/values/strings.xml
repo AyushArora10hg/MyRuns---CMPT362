@@ -14,5 +14,5 @@
     <string name="button1">Save</string>
     <string name="button2">Cancel</string>
     <string name="photoViewText">"Profile Photo: "</string>
-    <string name="cameraButton">Change</string>
+    <string name="cameraButtonText">Change</string>
 </resources>
