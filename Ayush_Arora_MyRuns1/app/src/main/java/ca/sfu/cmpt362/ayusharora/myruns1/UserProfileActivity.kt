@@ -30,23 +30,35 @@ class UserProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.user_profile_activity)
+        Util.checkPermissions(this)
+
+        setupViews()
+        setupViewModel()
+        loadExistingImage()
+        setupCameraButton()
+        setupCameraLauncher()
+
+
+    }
+
+    private fun setupViews(){
 
         imageView = findViewById(R.id.imageProfile)
         button = findViewById(R.id.cameraButton)
-        Util.checkPermissions(this)
 
         val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
             tempImgFileName)
         tempImgUri = FileProvider.getUriForFile(this,
             "ca.sfu.cmpt362.ayusharora.myruns1", tempImgFile)
 
-        button.setOnClickListener(){
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-            cameraResult.launch(intent)
-        }
+    }
 
+    private fun setupViewModel() {
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
+        myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it) }
+    }
+
+    private fun setupCameraLauncher(){
 
         cameraResult = registerForActivityResult(StartActivityForResult())
         { result: ActivityResult ->
@@ -57,13 +69,22 @@ class UserProfileActivity : AppCompatActivity() {
             }
         }
 
-                myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it)
+    }
+
+    private fun setupCameraButton(){
+        button.setOnClickListener(){
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+            cameraResult.launch(intent)
         }
 
+    }
+
+    private fun loadExistingImage() {
+        val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
         if (tempImgFile.exists()) {
             val bitmap = Util.getBitmap(this, tempImgUri)
-            imageView.setImageBitmap(bitmap)
+            myViewModel.userImage.value = bitmap
         }
-
     }
 }
