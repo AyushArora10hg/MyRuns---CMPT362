@@ -107,6 +107,8 @@ class UserProfileActivity : AppCompatActivity() {
         val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
             imageView.setImageURI(Uri.fromFile(finalImgFile))
+        } else {
+            imageView.setImageResource(R.drawable.default_profile)
         }
 
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
