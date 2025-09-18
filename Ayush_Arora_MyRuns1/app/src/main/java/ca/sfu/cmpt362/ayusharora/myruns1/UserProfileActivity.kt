@@ -46,14 +46,11 @@ class UserProfileActivity : AppCompatActivity() {
         setContentView(R.layout.user_profile_activity)
         Util.checkPermissions(this)
 
-        setupViews()
+        setup()
         loadProfile()
-        setupViewModel()
-        loadExistingImage()
         setupButtons()
         setupCameraLauncher()
     }
-
     private fun loadProfile(){
 
         nameEditText.setText(userData.getString("name", ""))
@@ -87,7 +84,7 @@ class UserProfileActivity : AppCompatActivity() {
             )
         }
     }
-    private fun setupViews(){
+    private fun setup(){
 
         imageView = findViewById(R.id.imageProfile)
         changeButton = findViewById(R.id.cameraButton)
@@ -107,13 +104,15 @@ class UserProfileActivity : AppCompatActivity() {
         tempImgUri = FileProvider.getUriForFile(this,
             "ca.sfu.cmpt362.ayusharora.myruns1", tempImgFile)
 
-    }
+        val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
+        if (finalImgFile.exists()) {
+            imageView.setImageURI(Uri.fromFile(finalImgFile))
+        }
 
-    private fun setupViewModel() {
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
         myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it) }
-    }
 
+    }
     private fun setupCameraLauncher(){
 
         cameraResult = registerForActivityResult(StartActivityForResult())
@@ -152,13 +151,6 @@ class UserProfileActivity : AppCompatActivity() {
             val tempFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
             if (tempFile.exists()) tempFile.delete()
             finish()
-        }
-    }
-
-    private fun loadExistingImage() {
-        val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
-        if (finalImgFile.exists()) {
-            imageView.setImageURI(Uri.fromFile(finalImgFile))
         }
     }
 }

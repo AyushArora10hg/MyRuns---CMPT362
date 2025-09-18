@@ -11,10 +11,10 @@
     <string name="femaleRadioButton">Female</string>
     <string name="maleRadioButton">Male</string>
     <string name="majorHint">eg. computing science</string>
-    <string name="button1">Save</string>
-    <string name="button2">Cancel</string>
+    <string name="button1">SAVE</string>
+    <string name="button2">CANCEL</string>
     <string name="photoViewText">"Profile Photo: "</string>
-    <string name="cameraButtonText">Change</string>
+    <string name="cameraButtonText">CHANGE</string>
     <string name="classViewText">"Class: "</string>
     <string name="classHint">eg. 2023</string>
 </resources>
