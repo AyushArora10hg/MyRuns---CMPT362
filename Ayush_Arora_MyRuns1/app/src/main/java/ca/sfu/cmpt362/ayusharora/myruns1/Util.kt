@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-object Util { .
+object Util {
     fun checkPermissions(activity: Activity?) {
 
         if (ContextCompat.checkSelfPermission(
