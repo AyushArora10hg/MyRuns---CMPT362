@@ -25,12 +25,13 @@ import androidx.core.content.edit
 class UserProfileActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
-    private lateinit var changeButton: Button
     private lateinit var tempImgUri: Uri
     private val tempImgFileName = "temp_profile_img.jpg"
+    private val finalImgFileName = "profile_img.jpg"
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     private lateinit var userData: SharedPreferences
+    private lateinit var changeButton: Button
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
     private lateinit var nameEditText: EditText
@@ -118,16 +119,17 @@ class UserProfileActivity : AppCompatActivity() {
         cameraResult = registerForActivityResult(StartActivityForResult())
         { result: ActivityResult ->
             if(result.resultCode == Activity.RESULT_OK){
-                val bitmap = Util.getBitmap(this, tempImgUri)
-                myViewModel.userImage.value = bitmap
-
+                val tempFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
+                if (tempFile.exists()) {
+                    imageView.setImageURI(Uri.fromFile(tempFile))
+                }
             }
         }
 
     }
-
     private fun setupButtons(){
         changeButton.setOnClickListener(){
+
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
             cameraResult.launch(intent)
@@ -135,21 +137,28 @@ class UserProfileActivity : AppCompatActivity() {
 
         saveButton.setOnClickListener {
             saveProfile()
+            val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
+            val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
+
+            if (tempImgFile.exists()) {
+                tempImgFile.copyTo(finalImgFile, overwrite = true)
+                tempImgFile.delete()
+            }
             Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show()
             finish()
         }
 
         cancelButton.setOnClickListener {
-            Toast.makeText(this, "Cancelled!", Toast.LENGTH_SHORT).show()
+            val tempFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
+            if (tempFile.exists()) tempFile.delete()
             finish()
         }
     }
 
     private fun loadExistingImage() {
-        val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
-        if (tempImgFile.exists()) {
-            val bitmap = Util.getBitmap(this, tempImgUri)
-            myViewModel.userImage.value = bitmap
+        val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
+        if (finalImgFile.exists()) {
+            imageView.setImageURI(Uri.fromFile(finalImgFile))
         }
     }
 }

@@ -14,15 +14,12 @@ import androidx.core.content.ContextCompat
 object Util {
     fun checkPermissions(activity: Activity?) {
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), 0)
         }
-    }
-
-    fun getBitmap(context: Context, imgUri: Uri): Bitmap {
-        val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(imgUri))
-        val matrix = Matrix()
-        val ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        return ret
     }
 }
