@@ -1,5 +1,7 @@
 package ca.sfu.cmpt362.ayusharora.myruns1
 
+//Code copied from lecture 2 demo (CameraDemoKotlin)
+
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager

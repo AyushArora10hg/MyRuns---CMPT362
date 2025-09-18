@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
@@ -101,6 +100,7 @@ class UserProfileActivity : AppCompatActivity() {
 
         userData = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
 
+        // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)
         finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
             imageView.setImageURI(Uri.fromFile(finalImgFile))
@@ -117,6 +117,8 @@ class UserProfileActivity : AppCompatActivity() {
         myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it) }
 
     }
+
+    //The code for this function is derived from lecture 2 demo (CameraDemoKotlin)
     private fun setupCameraLauncher(){
 
         cameraResult = registerForActivityResult(StartActivityForResult())
@@ -129,7 +131,10 @@ class UserProfileActivity : AppCompatActivity() {
         }
 
     }
+
+    //The code for this function is derived and extended from lecture 2 demo (CameraDemoKotlin)
     private fun setupButtons(){
+
         changeButton.setOnClickListener(){
 
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
