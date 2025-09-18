@@ -27,7 +27,9 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var tempImgUri: Uri
     private val tempImgFileName = "temp_profile_img.jpg"
+    private lateinit var tempImgFile: File
     private val finalImgFileName = "profile_img.jpg"
+    private lateinit var finalImgFile: File
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     private lateinit var userData: SharedPreferences
@@ -99,17 +101,17 @@ class UserProfileActivity : AppCompatActivity() {
 
         userData = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
 
-        val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            tempImgFileName)
-        tempImgUri = FileProvider.getUriForFile(this,
-            "ca.sfu.cmpt362.ayusharora.myruns1", tempImgFile)
-
-        val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
+        finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
             imageView.setImageURI(Uri.fromFile(finalImgFile))
         } else {
             imageView.setImageResource(R.drawable.default_profile)
         }
+
+        tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            tempImgFileName)
+        tempImgUri = FileProvider.getUriForFile(this,
+            "ca.sfu.cmpt362.ayusharora.myruns1", tempImgFile)
 
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
         myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it) }
@@ -120,9 +122,8 @@ class UserProfileActivity : AppCompatActivity() {
         cameraResult = registerForActivityResult(StartActivityForResult())
         { result: ActivityResult ->
             if(result.resultCode == Activity.RESULT_OK){
-                val tempFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
-                if (tempFile.exists()) {
-                    imageView.setImageURI(Uri.fromFile(tempFile))
+                if (tempImgFile.exists()) {
+                    imageView.setImageURI(Uri.fromFile(tempImgFile))
                 }
             }
         }
@@ -138,8 +139,6 @@ class UserProfileActivity : AppCompatActivity() {
 
         saveButton.setOnClickListener {
             saveProfile()
-            val tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
-            val finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
 
             if (tempImgFile.exists()) {
                 tempImgFile.copyTo(finalImgFile, overwrite = true)
@@ -150,8 +149,7 @@ class UserProfileActivity : AppCompatActivity() {
         }
 
         cancelButton.setOnClickListener {
-            val tempFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), tempImgFileName)
-            if (tempFile.exists()) tempFile.delete()
+            if (tempImgFile.exists()) tempImgFile.delete()
             finish()
         }
     }
