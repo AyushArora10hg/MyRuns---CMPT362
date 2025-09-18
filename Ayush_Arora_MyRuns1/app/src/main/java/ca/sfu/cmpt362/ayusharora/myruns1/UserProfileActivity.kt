@@ -77,8 +77,8 @@ class UserProfileActivity : AppCompatActivity() {
 
             putString(
                 "gender", when (genderRadioGroup.checkedRadioButtonId) {
-                    R.id.maleRadioButton -> "Male"
-                    R.id.femaleRadioButton -> "Female"
+                    R.id.maleRadioButton -> getString(R.string.maleRadioButton)
+                    R.id.femaleRadioButton -> getString(R.string.femaleRadioButton)
                     else -> ""
                 }
             )
