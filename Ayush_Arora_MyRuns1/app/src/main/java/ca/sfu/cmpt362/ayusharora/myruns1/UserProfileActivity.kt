@@ -114,8 +114,9 @@ class UserProfileActivity : AppCompatActivity() {
             "ca.sfu.cmpt362.ayusharora.myruns1", tempImgFile)
 
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
-        myViewModel.userImage.observe(this) { it -> imageView.setImageBitmap(it) }
-
+        myViewModel.userImage.observe(this) { it ->
+            imageView.setImageBitmap(it)
+        }
     }
 
     //The code for this function is derived from lecture 2 demo (CameraDemoKotlin)
@@ -123,10 +124,9 @@ class UserProfileActivity : AppCompatActivity() {
 
         cameraResult = registerForActivityResult(StartActivityForResult())
         { result: ActivityResult ->
-            if(result.resultCode == Activity.RESULT_OK){
-                if (tempImgFile.exists()) {
-                    imageView.setImageURI(Uri.fromFile(tempImgFile))
-                }
+            if (tempImgFile.exists()) {
+                val bitmap = Util.getBitmap(this, tempImgUri)
+                myViewModel.userImage.value = bitmap
             }
         }
 
