@@ -17,4 +17,7 @@
     <string name="cameraButtonText">CHANGE</string>
     <string name="classViewText">"Class: "</string>
     <string name="classHint">eg. 2023</string>
+    <string name="mainLeftTab">START</string>
+    <string name="mainCenterTab">HISTORY</string>
+    <string name="mainRightTab">SETTINGS</string>
 </resources>

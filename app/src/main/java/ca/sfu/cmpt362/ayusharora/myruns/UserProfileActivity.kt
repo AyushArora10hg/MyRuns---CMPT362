@@ -44,7 +44,7 @@ class UserProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.user_profile_activity)
+        setContentView(R.layout.activity_user_profile)
         Util.checkPermissions(this)
         setup()
         loadProfile()

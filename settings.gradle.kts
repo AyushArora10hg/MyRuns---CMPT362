@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Ayush_Arora_MyRuns1"
+rootProject.name = "MyRuns---CMPT362"
 include(":app")
