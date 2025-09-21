@@ -1,17 +1,19 @@
 package ca.sfu.cmpt362.ayusharora.myruns
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences( savedInstanceState: Bundle?, rootKey: String?) {
+        this.addPreferencesFromResource(R.xml.preference)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        val userProfilePreference = findPreference<Preference>("user_profile_preference")
+        userProfilePreference?.setOnPreferenceClickListener {
+            val intent = Intent(requireContext(), UserProfileActivity::class.java)
+            startActivity(intent)
+            true
+        }
     }
 }

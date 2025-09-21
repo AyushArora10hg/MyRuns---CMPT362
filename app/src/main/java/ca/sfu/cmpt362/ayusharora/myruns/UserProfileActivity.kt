@@ -31,7 +31,7 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var finalImgFile: File
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
-    private lateinit var userData: SharedPreferences
+    private val PROFILE_DATA = "MyRuns_UserProfile"
     private lateinit var changeButton: Button
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
@@ -45,7 +45,6 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
-        Util.checkPermissions(this)
         setup()
         loadProfile()
         setupButtons()
@@ -53,13 +52,15 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun loadProfile(){
 
-        nameEditText.setText(userData.getString("name", ""))
-        emailEditText.setText(userData.getString("email", ""))
-        phoneEditText.setText(userData.getString("phone", ""))
-        classEditText.setText(userData.getString("class", ""))
-        majorEditText.setText(userData.getString("major", ""))
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, Context.MODE_PRIVATE)
 
-        val savedGender = userData.getString("gender", "")
+        nameEditText.setText(sharedPreference.getString("name", ""))
+        emailEditText.setText(sharedPreference.getString("email", ""))
+        phoneEditText.setText(sharedPreference.getString("phone", ""))
+        classEditText.setText(sharedPreference.getString("class", ""))
+        majorEditText.setText(sharedPreference.getString("major", ""))
+
+        val savedGender = sharedPreference.getString("gender", "")
         if (savedGender == getString(R.string.maleRadioButton)) {
             genderRadioGroup.check(R.id.maleRadioButton)
         } else if (savedGender == getString(R.string.femaleRadioButton)) {
@@ -68,7 +69,8 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun saveProfile(){
 
-        userData.edit {
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, Context.MODE_PRIVATE)
+        sharedPreference.edit {
             putString("name", nameEditText.text.toString())
             putString("email", emailEditText.text.toString())
             putString("phone", phoneEditText.text.toString())
@@ -97,7 +99,6 @@ class UserProfileActivity : AppCompatActivity() {
         majorEditText = findViewById(R.id.majorEditText)
         genderRadioGroup = findViewById(R.id.genderRadioGroup)
 
-        userData = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
 
         // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)
         finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)

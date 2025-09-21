@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Account Preferences -->
+    <PreferenceCategory
+        android:title="Account Preferences">
+
+        <Preference
+            android:key="user_profile_preference"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Name, Email, Class etc."
+            android:summary="User Profile"/>
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
