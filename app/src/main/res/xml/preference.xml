@@ -1,17 +1,51 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Account Preferences -->
-    <PreferenceCategory
-        android:title="Account Preferences">
+    <PreferenceCategory android:title="Account Preferences">
 
         <Preference
             android:key="user_profile_preference"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
             android:title="Name, Email, Class etc."
             android:summary="User Profile"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Additional Settings">
+
+
+        <CheckBoxPreference
+            android:key="privacy_preference"
+            android:defaultValue="false"
+            android:title="Privacy Setting"
+            android:summary="Posting your records anonymously"/>
+
+        <ListPreference
+            android:key="unit_preference"
+            android:title="Unit Preference"
+            android:summary="Select the units"
+            android:entries="@array/unit_options"
+            android:entryValues="@array/unit_values"
+            android:defaultValue="metric" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="Misc.">
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="comment_preference"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Comments"
+            android:summary="Please enter your comments"/>
+
+
+        <Preference
+            android:key="webpage_preference"
+            android:title="Webpage"
+            android:summary="@string/webpageURL"/>
+
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

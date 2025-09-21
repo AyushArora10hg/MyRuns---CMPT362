@@ -20,4 +20,5 @@
     <string name="mainLeftTab">START</string>
     <string name="mainCenterTab">HISTORY</string>
     <string name="mainRightTab">SETTINGS</string>
+    <string name="webpageURL">https://www.sfu.ca/computing.html</string>
 </resources>
