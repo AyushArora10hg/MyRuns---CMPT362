@@ -12,11 +12,16 @@ class MainActivity : AppCompatActivity() {
         this.setContentView(R.layout.activity_main)
         Util.checkPermissions(this)
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.mainFragmentContainer, StartFragment())
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mainFragmentContainer, StartFragment())
+                .commit()
+        }
 
         mainTabLayout = findViewById(R.id.mainTabLayout)
+
+        val selectedTab = savedInstanceState?.getInt("selected_tab") ?: 0
+        mainTabLayout.getTabAt(selectedTab)?.select()
 
         mainTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -35,4 +40,10 @@ class MainActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) = Unit
         })
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("selected_tab", mainTabLayout.selectedTabPosition)
+    }
+
 }
