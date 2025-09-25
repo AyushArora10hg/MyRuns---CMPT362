@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
+//Code adapted from demo code (static fragment)
 class HistoryFragment : Fragment() {
 
     override fun onCreateView(
