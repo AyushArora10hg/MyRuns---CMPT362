@@ -18,4 +18,7 @@
     <string name="classViewText">"Class: "</string>
     <string name="classHint">eg. 2023</string>
     <string name="webpageURL">https://www.sfu.ca/computing.html</string>
+    <string name="spinner1">Input Type</string>
+    <string name="spinner2">Activity Type</string>
+    <string name="startButton">START</string>
 </resources>

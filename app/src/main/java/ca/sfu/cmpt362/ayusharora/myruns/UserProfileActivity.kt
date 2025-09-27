@@ -62,9 +62,9 @@ class UserProfileActivity : AppCompatActivity() {
 
         val savedGender = sharedPreference.getString("gender", "")
         if (savedGender == getString(R.string.maleRadioButton)) {
-            genderRadioGroup.check(R.id.maleRadioButton)
+            genderRadioGroup.check(R.id.up_radiobutton_male)
         } else if (savedGender == getString(R.string.femaleRadioButton)) {
-            genderRadioGroup.check(R.id.femaleRadioButton)
+            genderRadioGroup.check(R.id.up_radiobutton_female)
         }
     }
     private fun saveProfile(){
@@ -79,8 +79,8 @@ class UserProfileActivity : AppCompatActivity() {
 
             putString(
                 "gender", when (genderRadioGroup.checkedRadioButtonId) {
-                    R.id.maleRadioButton -> getString(R.string.maleRadioButton)
-                    R.id.femaleRadioButton -> getString(R.string.femaleRadioButton)
+                    R.id.up_radiobutton_male -> getString(R.string.maleRadioButton)
+                    R.id.up_radiobutton_female -> getString(R.string.femaleRadioButton)
                     else -> ""
                 }
             )
@@ -88,16 +88,16 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun setup(){
 
-        imageView = findViewById(R.id.imageProfile)
-        changeButton = findViewById(R.id.cameraButton)
-        saveButton = findViewById(R.id.saveButton)
-        cancelButton = findViewById(R.id.cancelButton)
-        nameEditText = findViewById(R.id.nameEditText)
-        emailEditText = findViewById(R.id.emailEditText)
-        phoneEditText = findViewById(R.id.phoneEditText)
-        classEditText = findViewById(R.id.classEditText)
-        majorEditText = findViewById(R.id.majorEditText)
-        genderRadioGroup = findViewById(R.id.genderRadioGroup)
+        imageView = findViewById(R.id.up_image_view)
+        changeButton = findViewById(R.id.up_button_camera)
+        saveButton = findViewById(R.id.up_button_save)
+        cancelButton = findViewById(R.id.up_button_cancel)
+        nameEditText = findViewById(R.id.up_edittext_name)
+        emailEditText = findViewById(R.id.up_edittext_email)
+        phoneEditText = findViewById(R.id.up_edittext_phone)
+        classEditText = findViewById(R.id.up_edittext_class)
+        majorEditText = findViewById(R.id.up_edittext_major)
+        genderRadioGroup = findViewById(R.id.up_radiogroup_gender)
 
 
         // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)

@@ -48,14 +48,14 @@
                 android:padding="20dp">
 
                 <ImageView
-                    android:id="@+id/imageProfile"
+                    android:id="@+id/up_image_view"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_marginEnd="15dp">
                 </ImageView>
 
                 <Button
-                    android:id="@+id/cameraButton"
+                    android:id="@+id/up_button_camera"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -73,7 +73,7 @@
                 android:text="@string/nameViewText" />
 
             <EditText
-                android:id="@+id/nameEditText"
+                android:id="@+id/up_edittext_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="name"
@@ -88,7 +88,7 @@
                 android:text="@string/emailViewText" />
 
             <EditText
-                android:id="@+id/emailEditText"
+                android:id="@+id/up_edittext_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="emailAddress"
@@ -103,7 +103,7 @@
                 android:text="@string/phoneNumberViewText" />
 
             <EditText
-                android:id="@+id/phoneEditText"
+                android:id="@+id/up_edittext_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="phone"
@@ -118,20 +118,20 @@
                 android:text="@string/genderViewText" />
 
             <RadioGroup
-                android:id="@+id/genderRadioGroup"
+                android:id="@+id/up_radiogroup_gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/femaleRadioButton"
+                    android:id="@+id/up_radiobutton_female"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="@string/femaleRadioButton"
                     android:layout_marginEnd="50dp"/>
 
                 <RadioButton
-                    android:id="@+id/maleRadioButton"
+                    android:id="@+id/up_radiobutton_male"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="@string/maleRadioButton"/>
@@ -144,7 +144,7 @@
                 android:text="@string/classViewText" />
 
             <EditText
-                android:id="@+id/classEditText"
+                android:id="@+id/up_edittext_class"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="none"
@@ -159,7 +159,7 @@
                 android:text="@string/majorViewText" />
 
             <EditText
-                android:id="@+id/majorEditText"
+                android:id="@+id/up_edittext_major"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="none"
@@ -177,7 +177,7 @@
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/saveButton"
+                    android:id="@+id/up_button_save"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -188,7 +188,7 @@
                     android:textColor="@color/black"
                     android:layout_marginEnd="8dp" />
                 <Button
-                    android:id="@+id/cancelButton"
+                    android:id="@+id/up_button_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         this.setContentView(R.layout.activity_main)
         Util.checkPermissions(this)
 
-        viewPager2 = findViewById(R.id.viewpager)
+        viewPager2 = findViewById(R.id.main_viewpager)
         tabLayout = findViewById(R.id.tab)
 
         fragments = ArrayList()
