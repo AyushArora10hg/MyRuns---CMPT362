@@ -47,10 +47,12 @@ class StartFragment : Fragment() {
                 0->{
                     val intent = Intent(requireContext(), ManualInputActivity::class.java)
                     startActivity(intent)
+                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItem.toString())
                 }
                 1, 2->{
                     val intent = Intent(requireContext(), MapDisplayActivity::class.java)
                     startActivity(intent)
+                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItem.toString())
                 }
             }
         }

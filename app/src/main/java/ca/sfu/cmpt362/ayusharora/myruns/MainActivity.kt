@@ -8,18 +8,18 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
 import java.util.ArrayList
-
-private lateinit var viewPager2: ViewPager2
-private lateinit var tabLayout: TabLayout
-private lateinit var myMyFragmentStateAdapter: MyFragmentStateAdapter
-private lateinit var fragments: ArrayList<Fragment>
-private lateinit var startFragment: StartFragment
-private lateinit var historyFragment: HistoryFragment
-private lateinit var settingFragment: SettingsFragment
-private val tabTitles = arrayOf("START", "HISTORY", "SETTINGS")
-private lateinit var tabConfigurationStrategy: TabConfigurationStrategy
-private lateinit var tabLayoutMediator: TabLayoutMediator
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewPager2: ViewPager2
+    private lateinit var tabLayout: TabLayout
+    private lateinit var myMyFragmentStateAdapter: MyFragmentStateAdapter
+    private lateinit var fragments: ArrayList<Fragment>
+    private lateinit var startFragment: StartFragment
+    private lateinit var historyFragment: HistoryFragment
+    private lateinit var settingFragment: SettingsFragment
+    private val tabTitles = arrayOf("START", "HISTORY", "SETTINGS")
+    private lateinit var tabConfigurationStrategy: TabConfigurationStrategy
+    private lateinit var tabLayoutMediator: TabLayoutMediator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
