@@ -32,4 +32,14 @@
         <item>Elliptical</item>
         <item>Other</item>
     </string-array>
+
+    <string-array name="manual_entry_fields">
+        <item>Date</item>
+        <item>Time</item>
+        <item>Duration</item>
+        <item>Distance</item>
+        <item>Calories</item>
+        <item>Heart Rate</item>
+        <item>Comment</item>
+    </string-array>
 </resources>

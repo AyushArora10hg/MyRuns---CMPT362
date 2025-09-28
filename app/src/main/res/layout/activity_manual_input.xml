@@ -1,6 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ManualInputActivity">
 
-</ListView>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/mi_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="@string/app_name"
+        android:layout_alignParentTop="true" />
+
+    <View
+        android:id="@+id/mi_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_below="@id/mi_toolbar"
+        android:layout_marginBottom="5dp"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mi_listview"
+        android:layout_below="@id/mi_divider"/>
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/mi_button_save"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button1"
+            app:cornerRadius="0dp"
+            android:backgroundTint="@color/gray"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/mi_button_cancel"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button2"
+            app:cornerRadius="0dp"
+            android:backgroundTint="@color/gray"
+            android:textColor="@color/black"/>
+    </LinearLayout>
+
+</RelativeLayout>
