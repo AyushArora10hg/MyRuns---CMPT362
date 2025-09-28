@@ -11,6 +11,7 @@ import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.DialogFragment
 import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
@@ -53,11 +54,51 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
                     )
                     timePickerDialog.show()
                 }
-                2->{}
-                3->{}
-                4->{}
-                5->{}
-                6->{}
+                2->{
+                    val dialog = DialogFragment()
+                    val args = Bundle()
+                    args.putInt(DialogFragment.DIALOG_TYPE_KEY, DialogFragment.TYPE_INPUT)
+                    args.putString(DialogFragment.TITLE_KEY, "Duration")
+                    args.putInt(DialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
+                    dialog.arguments = args
+                    dialog.show(supportFragmentManager, "durationDialog")
+                }
+                3->{
+                    val dialog = DialogFragment()
+                    val args = Bundle()
+                    args.putInt(DialogFragment.DIALOG_TYPE_KEY, DialogFragment.TYPE_INPUT)
+                    args.putString(DialogFragment.TITLE_KEY, "Distance")
+                    args.putInt(DialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
+                    dialog.arguments = args
+                    dialog.show(supportFragmentManager, "distanceDialog")
+                }
+                4->{
+                    val dialog = DialogFragment()
+                    val args = Bundle()
+                    args.putInt(DialogFragment.DIALOG_TYPE_KEY, DialogFragment.TYPE_INPUT)
+                    args.putString(DialogFragment.TITLE_KEY, "Calories")
+                    args.putInt(DialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
+                    dialog.arguments = args
+                    dialog.show(supportFragmentManager, "CaloriesDialog")
+                }
+                5->{
+                    val dialog = DialogFragment()
+                    val args = Bundle()
+                    args.putInt(DialogFragment.DIALOG_TYPE_KEY, DialogFragment.TYPE_INPUT)
+                    args.putString(DialogFragment.TITLE_KEY, "Heart Rate")
+                    args.putInt(DialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
+                    dialog.arguments = args
+                    dialog.show(supportFragmentManager, "heartRateDialog")
+                }
+                6->{
+                    val dialog = DialogFragment()
+                    val args = Bundle()
+                    args.putInt(DialogFragment.DIALOG_TYPE_KEY, DialogFragment.TYPE_INPUT)
+                    args.putString(DialogFragment.TITLE_KEY, "Comments")
+                    args.putInt(DialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_TEXT)
+                    dialog.arguments = args
+                    dialog.show(supportFragmentManager, "commentDialog")
+                }
 
             }
         }
