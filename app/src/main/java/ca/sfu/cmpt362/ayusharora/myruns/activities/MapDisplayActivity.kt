@@ -1,7 +1,8 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import ca.sfu.cmpt362.ayusharora.myruns.R
 
 class MapDisplayActivity: AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.fragments
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

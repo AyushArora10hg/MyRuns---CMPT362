@@ -1,8 +1,6 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -14,12 +12,15 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.lifecycle.ViewModelProvider
-import java.io.File
 import androidx.core.content.edit
+import androidx.lifecycle.ViewModelProvider
+import ca.sfu.cmpt362.ayusharora.myruns.MyViewModel
+import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.Util
+import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
 
@@ -52,7 +53,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun loadProfile(){
 
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, Context.MODE_PRIVATE)
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
 
         nameEditText.setText(sharedPreference.getString("name", ""))
         emailEditText.setText(sharedPreference.getString("email", ""))
@@ -69,7 +70,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun saveProfile(){
 
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, Context.MODE_PRIVATE)
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
         sharedPreference.edit {
             putString("name", nameEditText.text.toString())
             putString("email", emailEditText.text.toString())
@@ -108,8 +109,10 @@ class UserProfileActivity : AppCompatActivity() {
             imageView.setImageResource(R.drawable.default_profile)
         }
 
-        tempImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            tempImgFileName)
+        tempImgFile = File(
+            getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            tempImgFileName
+        )
         tempImgUri = FileProvider.getUriForFile(this,
             "ca.sfu.cmpt362.ayusharora.myruns", tempImgFile)
 
@@ -122,7 +125,7 @@ class UserProfileActivity : AppCompatActivity() {
     //The code for this function is derived from lecture 2 demo (CameraDemoKotlin)
     private fun setupCameraLauncher(){
 
-        cameraResult = registerForActivityResult(StartActivityForResult())
+        cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
         { result: ActivityResult ->
             if (tempImgFile.exists()) {
                 val bitmap = Util.getBitmap(this, tempImgUri)

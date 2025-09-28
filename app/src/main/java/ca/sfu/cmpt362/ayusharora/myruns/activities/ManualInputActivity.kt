@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.activities
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -10,6 +10,7 @@ import android.widget.ListView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import ca.sfu.cmpt362.ayusharora.myruns.R
 import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
@@ -27,15 +28,18 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         saveButton = findViewById(R.id.mi_button_save)
         cancelButton = findViewById(R.id.mi_button_cancel)
 
-        val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,
-            android.R.layout.simple_list_item_1, resources.getStringArray(R.array.manual_entry_fields))
+        val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_list_item_1,
+            resources.getStringArray(R.array.manual_entry_fields)
+        )
         listView.adapter = arrayAdapter
 
         listView.setOnItemClickListener { parent, view, position, id ->
             when(position){
                 0->{
                     val datePickerDialog = DatePickerDialog(
-                        this, this,calendar.get(Calendar.YEAR),
+                        this, this, calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH)
                     )

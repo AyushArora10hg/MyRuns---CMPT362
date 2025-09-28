@@ -1,13 +1,19 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.HistoryFragment
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyFragmentStateAdapter
+import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.SettingsFragment
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.StartFragment
+import ca.sfu.cmpt362.ayusharora.myruns.Util
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
 import java.util.ArrayList
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewPager2: ViewPager2
@@ -18,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var historyFragment: HistoryFragment
     private lateinit var settingFragment: SettingsFragment
     private val tabTitles = arrayOf("START", "HISTORY", "SETTINGS")
-    private lateinit var tabConfigurationStrategy: TabConfigurationStrategy
+    private lateinit var tabConfigurationStrategy: TabLayoutMediator.TabConfigurationStrategy
     private lateinit var tabLayoutMediator: TabLayoutMediator
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +46,10 @@ class MainActivity : AppCompatActivity() {
         myMyFragmentStateAdapter = MyFragmentStateAdapter(this, fragments)
         viewPager2.adapter = myMyFragmentStateAdapter
 
-        tabConfigurationStrategy = TabConfigurationStrategy {
-                tab: TabLayout.Tab, position: Int ->
-            tab.text = tabTitles[position] }
+        tabConfigurationStrategy =
+            TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
+                tab.text = tabTitles[position]
+            }
         tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager2, tabConfigurationStrategy)
         tabLayoutMediator.attach()
     }

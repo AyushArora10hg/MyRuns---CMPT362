@@ -1,10 +1,11 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import ca.sfu.cmpt362.ayusharora.myruns.R
 
 //Code adapted from demo code (static fragment)
 class HistoryFragment : Fragment() {

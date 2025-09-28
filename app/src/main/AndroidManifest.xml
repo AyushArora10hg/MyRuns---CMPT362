@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ayush_Arora_MyRuns">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,9 +22,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".UserProfileActivity" />
-        <activity android:name=".ManualInputActivity" />
-        <activity android:name=".MapDisplayActivity" />
+        <activity android:name=".activities.UserProfileActivity" />
+        <activity android:name=".activities.ManualInputActivity" />
+        <activity android:name=".activities.MapDisplayActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
