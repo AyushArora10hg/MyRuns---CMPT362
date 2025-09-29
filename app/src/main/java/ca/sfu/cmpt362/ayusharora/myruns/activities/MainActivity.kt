@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         Util.checkPermissions(this)
 
         viewPager2 = findViewById(R.id.main_viewpager)
-        tabLayout = findViewById(R.id.tab)
+        tabLayout = findViewById(R.id.main_tablayout)
 
         fragments = ArrayList()
         startFragment = StartFragment()

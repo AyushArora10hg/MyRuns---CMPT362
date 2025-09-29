@@ -10,8 +10,6 @@ import androidx.fragment.app.DialogFragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
 
 class DialogFragment : DialogFragment(), DialogInterface.OnClickListener {
-
-
     companion object {
         const val DIALOG_TYPE_KEY = "dialogType"
         const val TITLE_KEY = "title"

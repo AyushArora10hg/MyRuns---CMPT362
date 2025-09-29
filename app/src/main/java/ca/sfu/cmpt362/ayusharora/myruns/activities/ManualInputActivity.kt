@@ -19,12 +19,22 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     private lateinit var listView: ListView
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
-    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_input)
 
+        setup()
+        handleListItems()
+        handleButtonClicks()
+    }
+
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+    }
+
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+    }
+    private fun setup(){
         listView = findViewById(R.id.mi_listview)
         saveButton = findViewById(R.id.mi_button_save)
         cancelButton = findViewById(R.id.mi_button_cancel)
@@ -35,10 +45,12 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             resources.getStringArray(R.array.manual_entry_fields)
         )
         listView.adapter = arrayAdapter
-
+    }
+    private fun handleListItems(){
         listView.setOnItemClickListener { parent, view, position, id ->
             when(position){
                 0->{
+                    val calendar = Calendar.getInstance()
                     val datePickerDialog = DatePickerDialog(
                         this, this, calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
@@ -47,6 +59,7 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
                     datePickerDialog.show()
                 }
                 1->{
+                    val calendar = Calendar.getInstance()
                     val timePickerDialog = TimePickerDialog(
                         this, this,
                         calendar.get(Calendar.HOUR_OF_DAY),
@@ -102,7 +115,8 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
 
             }
         }
-
+    }
+    private fun handleButtonClicks(){
         saveButton.setOnClickListener {
             //TODO: Save to database
             finish()
@@ -112,11 +126,5 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
             finish()
         }
-    }
-
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-    }
-
-    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
     }
 }
