@@ -42,4 +42,8 @@
         <item>Heart Rate</item>
         <item>Comment</item>
     </string-array>
+    <string-array name="user_profile_options">
+        <item>Take from camera</item>
+        <item>Select from gallery</item>
+    </string-array>
 </resources>

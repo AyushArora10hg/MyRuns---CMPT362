@@ -4,25 +4,29 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
 
-class DialogFragment : DialogFragment(), DialogInterface.OnClickListener {
+class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     companion object {
         const val DIALOG_TYPE_KEY = "dialogType"
         const val TITLE_KEY = "title"
         const val INPUT_TYPE_KEY = "inputType"
+        const val OPTIONS = "options"
 
         const val TYPE_INPUT = 1
+        const val TYPE_USER_PROFILE = 2
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val type = arguments?.getInt(DIALOG_TYPE_KEY)
-        val title = arguments?.getString(TITLE_KEY)
 
         val builder = AlertDialog.Builder(requireActivity())
+        val type = arguments?.getInt(DIALOG_TYPE_KEY)
+        val title = arguments?.getString(TITLE_KEY)
         if (type == TYPE_INPUT){
             val view = requireActivity().layoutInflater.inflate(
                 R.layout.fragment_input_dialog,
@@ -36,6 +40,18 @@ class DialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             builder.setTitle(title)
             builder.setPositiveButton("Save", this)
             builder.setNegativeButton("Cancel", this)
+        } else if (type == TYPE_USER_PROFILE){
+            val view = requireActivity().layoutInflater.inflate(
+                R.layout.fragment_options_dialog,
+                null)
+            val options = arguments?.getStringArray(OPTIONS)?:arrayOf("Option 1", "Option 2")
+            val listView = view.findViewById<ListView>(R.id.od_listview)
+            val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+                requireContext(),android.R.layout.simple_list_item_1,options
+            )
+            listView.adapter = arrayAdapter
+            builder.setTitle(title)
+            builder.setView(view)
         }
         return builder.create()
     }

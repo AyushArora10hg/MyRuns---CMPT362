@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.MyViewModel
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.Util
+import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyRunsDialogFragment
 import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
@@ -140,9 +141,17 @@ class UserProfileActivity : AppCompatActivity() {
 
         changeButton.setOnClickListener(){
 
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-            cameraResult.launch(intent)
+            val dialog = MyRunsDialogFragment()
+            val args = Bundle()
+            args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_USER_PROFILE)
+            args.putString(MyRunsDialogFragment.TITLE_KEY, "Select Profile Image")
+            args.putStringArray(MyRunsDialogFragment.OPTIONS, resources.getStringArray(R.array.user_profile_options))
+            dialog.arguments = args
+            dialog.show(supportFragmentManager, "UserProfileDialog")
+
+//            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+//            cameraResult.launch(intent)
         }
 
         saveButton.setOnClickListener {
