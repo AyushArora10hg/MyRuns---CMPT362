@@ -1,21 +1,26 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Account Preferences">
+    <PreferenceCategory android:title="Account Preferences"
+        app:iconSpaceReserved="false">
 
         <Preference
             android:key="user_profile_preference"
             android:title="User Profile"
-            android:summary="Name, Email, Class etc."/>
+            android:summary="Name, Email, Class etc."
+            app:iconSpaceReserved="false"/>
 
         <CheckBoxPreference
             android:key="privacy_preference"
             android:defaultValue="false"
             android:title="Privacy Setting"
-            android:summary="Posting your records anonymously"/>
+            android:summary="Posting your records anonymously"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Additional Settings">
+    <PreferenceCategory android:title="Additional Settings"
+        app:iconSpaceReserved="false">
 
         <ListPreference
             android:key="unit_preference"
@@ -23,7 +28,8 @@
             android:summary="Select the units"
             android:entries="@array/unit_options"
             android:entryValues="@array/unit_values"
-            android:defaultValue="metric" />
+            android:defaultValue="metric"
+            app:iconSpaceReserved="false"/>
 
         <EditTextPreference
             android:defaultValue=""
@@ -31,17 +37,19 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="Comments"
-            android:summary="Please enter your comments"/>
+            android:summary="Please enter your comments"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Misc.">
+    <PreferenceCategory android:title="Misc."
+        app:iconSpaceReserved="false">
 
         <Preference
             android:key="webpage_preference"
             android:title="Webpage"
-            android:summary="@string/link_webpage"/>
-
+            android:summary="@string/link_webpage"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
