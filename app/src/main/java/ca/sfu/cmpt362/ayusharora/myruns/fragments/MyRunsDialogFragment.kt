@@ -63,10 +63,6 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     }
 
     override fun onClick(dialog: DialogInterface?, item: Int) {
-        if (item == DialogInterface.BUTTON_POSITIVE) {
-            Toast.makeText(activity, "Saved!", Toast.LENGTH_SHORT).show()
-        } else if (item == DialogInterface.BUTTON_NEGATIVE) {
-            Toast.makeText(activity, "Entry Discarded", Toast.LENGTH_SHORT).show()
-        }
+        //TODO: Save to databse/cancel
     }
 }

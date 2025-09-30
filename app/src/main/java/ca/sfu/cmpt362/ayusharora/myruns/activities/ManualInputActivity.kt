@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyRunsDialogFragment
 import java.util.Calendar
-
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private lateinit var listView: ListView

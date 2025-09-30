@@ -1,6 +1,7 @@
 package ca.sfu.cmpt362.ayusharora.myruns.activities
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2

@@ -7,15 +7,15 @@
             android:title="User Profile"
             android:summary="Name, Email, Class etc."/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Additional Settings">
-
         <CheckBoxPreference
             android:key="privacy_preference"
             android:defaultValue="false"
             android:title="Privacy Setting"
             android:summary="Posting your records anonymously"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Additional Settings">
 
         <ListPreference
             android:key="unit_preference"
@@ -25,10 +25,6 @@
             android:entryValues="@array/unit_values"
             android:defaultValue="metric" />
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Misc.">
-
         <EditTextPreference
             android:defaultValue=""
             android:key="comment_preference"
@@ -37,6 +33,9 @@
             android:title="Comments"
             android:summary="Please enter your comments"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Misc.">
 
         <Preference
             android:key="webpage_preference"
