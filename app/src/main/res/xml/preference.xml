@@ -40,7 +40,7 @@
         <Preference
             android:key="webpage_preference"
             android:title="Webpage"
-            android:summary="@string/webpageURL"/>
+            android:summary="@string/link_webpage"/>
 
 
     </PreferenceCategory>

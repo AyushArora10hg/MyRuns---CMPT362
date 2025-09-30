@@ -1,25 +1,29 @@
 <resources>
     <string name="app_name">MyRuns</string>
-    <string name="nameViewText">Name: </string>
-    <string name="emailViewText">"Email: "</string>
-    <string name="phoneNumberViewText">"Phone Number: "</string>
-    <string name="genderViewText">"Gender: "</string>
-    <string name="majorViewText">"Major: "</string>
-    <string name="nameHint">eg. Ayush Arora</string>
-    <string name="emailHint">eg. ayusharora@xyz.com</string>
-    <string name="phoneNumberHint">eg. 111-222-3456</string>
-    <string name="femaleRadioButton">Female</string>
-    <string name="maleRadioButton">Male</string>
-    <string name="majorHint">eg. computing science</string>
-    <string name="button1">SAVE</string>
-    <string name="button2">CANCEL</string>
-    <string name="photoViewText">"Profile Photo: "</string>
-    <string name="cameraButtonText">CHANGE</string>
-    <string name="classViewText">"Class: "</string>
-    <string name="classHint">eg. 2023</string>
-    <string name="webpageURL">https://www.sfu.ca/computing.html</string>
-    <string name="spinner1">Input Type</string>
-    <string name="spinner2">Activity Type</string>
-    <string name="startButton">START</string>
-    <string name="map_display_heading">Map</string>
+    <string name="heading_map_display">Map</string>
+
+    <string name="textview_profile_photo">"Profile Photo: "</string>
+    <string name="textview_name">Name: </string>
+    <string name="hint_name">eg. Ayush Arora</string>
+    <string name="textview_email">"Email: "</string>
+    <string name="hint_email">eg. ayusharora@xyz.com</string>
+    <string name="textview_phone_number">"Phone Number: "</string>
+    <string name="hint_phone_number">eg. 111-222-3456</string>
+    <string name="textview_gender">"Gender: "</string>
+    <string name="radiobutton_female">Female</string>
+    <string name="radiobutton_male">Male</string>
+    <string name="textview_major">"Major: "</string>
+    <string name="hint_major">eg. computing science</string>
+    <string name="textview_class">"Class: "</string>
+    <string name="hint_class">eg. 2023</string>
+
+    <string name="button_positive">SAVE</string>
+    <string name="button_negative">CANCEL</string>
+    <string name="button_profile_photo">CHANGE</string>
+    <string name="button_launch">START</string>
+
+    <string name="spinner_input_type">Input Type</string>
+    <string name="spinner_activity_type">Activity Type</string>
+
+    <string name="link_webpage">https://www.sfu.ca/computing.html</string>
 </resources>

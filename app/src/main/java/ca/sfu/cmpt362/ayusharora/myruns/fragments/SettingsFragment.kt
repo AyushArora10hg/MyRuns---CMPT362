@@ -22,7 +22,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val webpagePreference = findPreference<Preference>("webpage_preference")
         webpagePreference?.setOnPreferenceClickListener {
-            val url = getString(R.string.webpageURL)
+            val url = getString(R.string.link_webpage)
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(intent)
             true

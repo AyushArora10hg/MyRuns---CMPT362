@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginBottom="10dp"
-                android:text="@string/photoViewText" />
+                android:text="@string/textview_profile_photo" />
 
 
             <LinearLayout
@@ -59,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="@string/cameraButtonText"
+                    android:text="@string/button_profile_photo"
                     app:cornerRadius="0dp"
                     android:backgroundTint="@color/gray"
                     android:textColor="@color/black"
@@ -71,14 +71,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/nameViewText" />
+                android:text="@string/textview_name" />
 
             <EditText
                 android:id="@+id/up_edittext_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="name"
-                android:hint="@string/nameHint"
+                android:hint="@string/hint_name"
                 android:inputType="textPersonName"
                 android:minHeight="48dp"
                 android:layout_marginBottom="10dp" />
@@ -86,14 +86,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/emailViewText" />
+                android:text="@string/textview_email" />
 
             <EditText
                 android:id="@+id/up_edittext_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="emailAddress"
-                android:hint="@string/emailHint"
+                android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
                 android:minHeight="48dp"
                 android:layout_marginBottom="10dp" />
@@ -101,14 +101,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/phoneNumberViewText" />
+                android:text="@string/textview_phone_number" />
 
             <EditText
                 android:id="@+id/up_edittext_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="phone"
-                android:hint="@string/phoneNumberHint"
+                android:hint="@string/hint_phone_number"
                 android:inputType="phone"
                 android:minHeight="48dp"
                 android:layout_marginBottom="10dp" />
@@ -116,7 +116,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/genderViewText" />
+                android:text="@string/textview_gender" />
 
             <RadioGroup
                 android:id="@+id/up_radiogroup_gender"
@@ -128,28 +128,28 @@
                     android:id="@+id/up_radiobutton_female"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/femaleRadioButton"
+                    android:text="@string/radiobutton_female"
                     android:layout_marginEnd="50dp"/>
 
                 <RadioButton
                     android:id="@+id/up_radiobutton_male"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/maleRadioButton"/>
+                    android:text="@string/radiobutton_male"/>
 
             </RadioGroup>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/classViewText" />
+                android:text="@string/textview_class" />
 
             <EditText
                 android:id="@+id/up_edittext_class"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="none"
-                android:hint="@string/classHint"
+                android:hint="@string/hint_class"
                 android:inputType="number"
                 android:minHeight="48dp"
                 android:layout_marginBottom="10dp" />
@@ -157,14 +157,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/majorViewText" />
+                android:text="@string/textview_gender" />
 
             <EditText
                 android:id="@+id/up_edittext_major"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="none"
-                android:hint="@string/majorHint"
+                android:hint="@string/hint_major"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:layout_marginBottom="10dp" />
@@ -181,7 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/button1"
+                    android:text="@string/button_positive"
                     app:cornerRadius="0dp"
                     android:backgroundTint="@color/gray"
                     android:textColor="@color/black"
@@ -193,7 +193,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/button2"
+                    android:text="@string/button_negative"
                     app:cornerRadius="0dp"
                     android:backgroundTint="@color/gray"
                     android:textColor="@color/black"

@@ -73,9 +73,9 @@ class UserProfileActivity : AppCompatActivity() {
         majorEditText.setText(sharedPreference.getString("major", ""))
 
         val savedGender = sharedPreference.getString("gender", "")
-        if (savedGender == getString(R.string.maleRadioButton)) {
+        if (savedGender == getString(R.string.radiobutton_male)) {
             genderRadioGroup.check(R.id.up_radiobutton_male)
-        } else if (savedGender == getString(R.string.femaleRadioButton)) {
+        } else if (savedGender == getString(R.string.radiobutton_female)) {
             genderRadioGroup.check(R.id.up_radiobutton_female)
         }
     }
@@ -91,8 +91,8 @@ class UserProfileActivity : AppCompatActivity() {
 
             putString(
                 "gender", when (genderRadioGroup.checkedRadioButtonId) {
-                    R.id.up_radiobutton_male -> getString(R.string.maleRadioButton)
-                    R.id.up_radiobutton_female -> getString(R.string.femaleRadioButton)
+                    R.id.up_radiobutton_male -> getString(R.string.radiobutton_male)
+                    R.id.up_radiobutton_female -> getString(R.string.radiobutton_female)
                     else -> ""
                 }
             )
