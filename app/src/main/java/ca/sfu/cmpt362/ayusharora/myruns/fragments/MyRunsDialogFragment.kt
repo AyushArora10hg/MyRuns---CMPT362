@@ -17,9 +17,8 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
         const val TITLE_KEY = "title"
         const val INPUT_TYPE_KEY = "inputType"
         const val OPTIONS = "options"
-
         const val TYPE_INPUT = 1
-        const val TYPE_USER_PROFILE = 2
+        const val TYPE_OPTION = 2
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -40,16 +39,23 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             builder.setTitle(title)
             builder.setPositiveButton("Save", this)
             builder.setNegativeButton("Cancel", this)
-        } else if (type == TYPE_USER_PROFILE){
+        } else if (type == TYPE_OPTION){
             val view = requireActivity().layoutInflater.inflate(
                 R.layout.fragment_options_dialog,
                 null)
-            val options = arguments?.getStringArray(OPTIONS)?:arrayOf("Option 1", "Option 2")
+            val options = arguments?.getStringArray(OPTIONS)!!
             val listView = view.findViewById<ListView>(R.id.od_listview)
             val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
                 requireContext(),android.R.layout.simple_list_item_1,options
             )
             listView.adapter = arrayAdapter
+            listView.setOnItemClickListener { parent, view, position, id ->
+                parentFragmentManager.setFragmentResult(
+                    "selectedChoice",
+                    Bundle().apply { putInt("choice", position) }
+                )
+                dismiss()
+            }
             builder.setTitle(title)
             builder.setView(view)
         }

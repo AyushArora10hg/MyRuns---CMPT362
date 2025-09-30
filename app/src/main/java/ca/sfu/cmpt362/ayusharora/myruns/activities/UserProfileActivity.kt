@@ -33,6 +33,7 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var finalImgFile: File
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
+    private lateinit var galleryResult: ActivityResultLauncher<Intent>
     private val PROFILE_DATA = "MyRuns_UserProfile"
     private lateinit var changeButton: Button
     private lateinit var saveButton: Button
@@ -50,7 +51,16 @@ class UserProfileActivity : AppCompatActivity() {
         setup()
         loadProfile()
         setupButtons()
-        setupCameraLauncher()
+    }
+    fun launchCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+        cameraResult.launch(intent)
+    }
+    fun launchGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        galleryResult.launch(intent)
     }
     private fun loadProfile(){
 
@@ -101,7 +111,6 @@ class UserProfileActivity : AppCompatActivity() {
         majorEditText = findViewById(R.id.up_edittext_major)
         genderRadioGroup = findViewById(R.id.up_radiogroup_gender)
 
-
         // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)
         finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
@@ -109,7 +118,6 @@ class UserProfileActivity : AppCompatActivity() {
         } else {
             imageView.setImageResource(R.drawable.default_profile)
         }
-
         tempImgFile = File(
             getExternalFilesDir(Environment.DIRECTORY_PICTURES),
             tempImgFileName
@@ -121,37 +129,47 @@ class UserProfileActivity : AppCompatActivity() {
         myViewModel.userImage.observe(this) { it ->
             imageView.setImageBitmap(it)
         }
-    }
 
-    //The code for this function is derived from lecture 2 demo (CameraDemoKotlin)
-    private fun setupCameraLauncher(){
-
-        cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
-        { result: ActivityResult ->
+        cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _->
             if (tempImgFile.exists()) {
                 val bitmap = Util.getBitmap(this, tempImgUri)
                 myViewModel.userImage.value = bitmap
             }
         }
 
+        galleryResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val uri = result.data!!.data!!
+                val bitmap = Util.getBitmap(this, uri)
+                myViewModel.userImage.value = bitmap
+                val input = contentResolver.openInputStream(uri)
+                val output = tempImgFile.outputStream()
+                input?.copyTo(output)
+                input?.close()
+                output.close()
+            }
+        }
     }
 
     //The code for this function is derived and extended from lecture 2 demo (CameraDemoKotlin)
     private fun setupButtons(){
 
-        changeButton.setOnClickListener(){
+        changeButton.setOnClickListener{
 
             val dialog = MyRunsDialogFragment()
             val args = Bundle()
-            args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_USER_PROFILE)
+            args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_OPTION)
             args.putString(MyRunsDialogFragment.TITLE_KEY, "Select Profile Image")
             args.putStringArray(MyRunsDialogFragment.OPTIONS, resources.getStringArray(R.array.user_profile_options))
             dialog.arguments = args
             dialog.show(supportFragmentManager, "UserProfileDialog")
 
-//            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-//            cameraResult.launch(intent)
+            supportFragmentManager.setFragmentResultListener("selectedChoice", this) { requestKey, bundle ->
+                when (bundle.getInt("choice")) {
+                    0 -> launchCamera()
+                    1 -> launchGallery()
+                }
+            }
         }
 
         saveButton.setOnClickListener {
