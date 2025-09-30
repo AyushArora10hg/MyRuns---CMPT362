@@ -4,8 +4,8 @@
 
         <Preference
             android:key="user_profile_preference"
-            android:title="Name, Email, Class etc."
-            android:summary="User Profile"/>
+            android:title="User Profile"
+            android:summary="Name, Email, Class etc."/>
 
     </PreferenceCategory>
 
