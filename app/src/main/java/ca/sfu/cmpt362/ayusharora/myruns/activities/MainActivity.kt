@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewPager2: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private lateinit var myMyFragmentStateAdapter: MyFragmentStateAdapter
+    private lateinit var myFragmentStateAdapter: MyFragmentStateAdapter
     private lateinit var fragments: ArrayList<Fragment>
     private lateinit var startFragment: StartFragment
     private lateinit var historyFragment: HistoryFragment
@@ -33,9 +33,17 @@ class MainActivity : AppCompatActivity() {
         this.setContentView(R.layout.activity_main)
         Util.checkPermissions(this)
 
-        viewPager2 = findViewById(R.id.main_viewpager)
-        tabLayout = findViewById(R.id.main_tablayout)
+        setupFragments()
+        enableSwipeNavigation()
+        handleTabLayout()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        tabLayoutMediator.detach()
+    }
+
+    private fun setupFragments(){
         fragments = ArrayList()
         startFragment = StartFragment()
         historyFragment = HistoryFragment()
@@ -43,20 +51,19 @@ class MainActivity : AppCompatActivity() {
         fragments.add(startFragment)
         fragments.add(historyFragment)
         fragments.add(settingFragment)
-
-        myMyFragmentStateAdapter = MyFragmentStateAdapter(this, fragments)
-        viewPager2.adapter = myMyFragmentStateAdapter
-
+    }
+    private fun enableSwipeNavigation(){
+        viewPager2 = findViewById(R.id.main_viewpager)
+        myFragmentStateAdapter = MyFragmentStateAdapter(this, fragments)
+        viewPager2.adapter = myFragmentStateAdapter
+    }
+    private fun handleTabLayout(){
+        tabLayout = findViewById(R.id.main_tablayout)
         tabConfigurationStrategy =
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->
                 tab.text = tabTitles[position]
             }
         tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager2, tabConfigurationStrategy)
         tabLayoutMediator.attach()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        tabLayoutMediator.detach()
     }
 }

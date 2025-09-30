@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RadioGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -51,52 +50,6 @@ class UserProfileActivity : AppCompatActivity() {
         setup()
         loadProfile()
         setupButtons()
-    }
-    fun launchCamera() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-        cameraResult.launch(intent)
-    }
-    fun launchGallery() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        galleryResult.launch(intent)
-    }
-    private fun loadProfile(){
-
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
-
-        nameEditText.setText(sharedPreference.getString("name", ""))
-        emailEditText.setText(sharedPreference.getString("email", ""))
-        phoneEditText.setText(sharedPreference.getString("phone", ""))
-        classEditText.setText(sharedPreference.getString("class", ""))
-        majorEditText.setText(sharedPreference.getString("major", ""))
-
-        val savedGender = sharedPreference.getString("gender", "")
-        if (savedGender == getString(R.string.radiobutton_male)) {
-            genderRadioGroup.check(R.id.up_radiobutton_male)
-        } else if (savedGender == getString(R.string.radiobutton_female)) {
-            genderRadioGroup.check(R.id.up_radiobutton_female)
-        }
-    }
-    private fun saveProfile(){
-
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
-        sharedPreference.edit {
-            putString("name", nameEditText.text.toString())
-            putString("email", emailEditText.text.toString())
-            putString("phone", phoneEditText.text.toString())
-            putString("class", classEditText.text.toString())
-            putString("major", majorEditText.text.toString())
-
-            putString(
-                "gender", when (genderRadioGroup.checkedRadioButtonId) {
-                    R.id.up_radiobutton_male -> getString(R.string.radiobutton_male)
-                    R.id.up_radiobutton_female -> getString(R.string.radiobutton_female)
-                    else -> ""
-                }
-            )
-        }
     }
     private fun setup(){
 
@@ -150,6 +103,42 @@ class UserProfileActivity : AppCompatActivity() {
             }
         }
     }
+    private fun loadProfile(){
+
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
+
+        nameEditText.setText(sharedPreference.getString("name", ""))
+        emailEditText.setText(sharedPreference.getString("email", ""))
+        phoneEditText.setText(sharedPreference.getString("phone", ""))
+        classEditText.setText(sharedPreference.getString("class", ""))
+        majorEditText.setText(sharedPreference.getString("major", ""))
+
+        val savedGender = sharedPreference.getString("gender", "")
+        if (savedGender == getString(R.string.radiobutton_male)) {
+            genderRadioGroup.check(R.id.up_radiobutton_male)
+        } else if (savedGender == getString(R.string.radiobutton_female)) {
+            genderRadioGroup.check(R.id.up_radiobutton_female)
+        }
+    }
+    private fun saveProfile(){
+
+        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
+        sharedPreference.edit {
+            putString("name", nameEditText.text.toString())
+            putString("email", emailEditText.text.toString())
+            putString("phone", phoneEditText.text.toString())
+            putString("class", classEditText.text.toString())
+            putString("major", majorEditText.text.toString())
+
+            putString(
+                "gender", when (genderRadioGroup.checkedRadioButtonId) {
+                    R.id.up_radiobutton_male -> getString(R.string.radiobutton_male)
+                    R.id.up_radiobutton_female -> getString(R.string.radiobutton_female)
+                    else -> ""
+                }
+            )
+        }
+    }
 
     //The code for this function is derived and extended from lecture 2 demo (CameraDemoKotlin)
     private fun setupButtons(){
@@ -187,5 +176,15 @@ class UserProfileActivity : AppCompatActivity() {
             if (tempImgFile.exists()) tempImgFile.delete()
             finish()
         }
+    }
+    private fun launchCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+        cameraResult.launch(intent)
+    }
+    private fun launchGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        galleryResult.launch(intent)
     }
 }

@@ -27,7 +27,6 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         handleListItems()
         handleButtonClicks()
     }
-
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
     }
 
@@ -66,52 +65,11 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
                     )
                     timePickerDialog.show()
                 }
-                2->{
-                    val dialog = MyRunsDialogFragment()
-                    val args = Bundle()
-                    args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
-                    args.putString(MyRunsDialogFragment.TITLE_KEY, "Duration")
-                    args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
-                    dialog.arguments = args
-                    dialog.show(supportFragmentManager, "durationDialog")
-                }
-                3->{
-                    val dialog = MyRunsDialogFragment()
-                    val args = Bundle()
-                    args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
-                    args.putString(MyRunsDialogFragment.TITLE_KEY, "Distance")
-                    args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
-                    dialog.arguments = args
-                    dialog.show(supportFragmentManager, "distanceDialog")
-                }
-                4->{
-                    val dialog = MyRunsDialogFragment()
-                    val args = Bundle()
-                    args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
-                    args.putString(MyRunsDialogFragment.TITLE_KEY, "Calories")
-                    args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
-                    dialog.arguments = args
-                    dialog.show(supportFragmentManager, "CaloriesDialog")
-                }
-                5->{
-                    val dialog = MyRunsDialogFragment()
-                    val args = Bundle()
-                    args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
-                    args.putString(MyRunsDialogFragment.TITLE_KEY, "Heart Rate")
-                    args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_NUMBER)
-                    dialog.arguments = args
-                    dialog.show(supportFragmentManager, "heartRateDialog")
-                }
-                6->{
-                    val dialog = MyRunsDialogFragment()
-                    val args = Bundle()
-                    args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
-                    args.putString(MyRunsDialogFragment.TITLE_KEY, "Comments")
-                    args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, android.text.InputType.TYPE_CLASS_TEXT)
-                    dialog.arguments = args
-                    dialog.show(supportFragmentManager, "commentDialog")
-                }
-
+                2->{showInputDialog("durationDialog", "Duration", android.text.InputType.TYPE_CLASS_NUMBER)}
+                3->{showInputDialog("distanceDialog", "Distance", android.text.InputType.TYPE_CLASS_NUMBER)}
+                4->{showInputDialog("calorieDialog", "Calories", android.text.InputType.TYPE_CLASS_NUMBER)}
+                5->{showInputDialog("heartRateDialog", "Heart Rate", android.text.InputType.TYPE_CLASS_NUMBER)}
+                6->{showInputDialog("commentsDialog", "Comments", android.text.InputType.TYPE_CLASS_TEXT)}
             }
         }
     }
@@ -125,5 +83,14 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+    private fun showInputDialog(tag: String, title: String, inputType: Int){
+        val dialog = MyRunsDialogFragment()
+        val args = Bundle()
+        args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
+        args.putString(MyRunsDialogFragment.TITLE_KEY, title)
+        args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, inputType)
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, tag)
     }
 }
