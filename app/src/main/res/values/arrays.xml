@@ -10,6 +10,12 @@
         <item>imperial</item>
     </string-array>
 
+    <string-array name="main_tab_titles">
+        <item>START</item>
+        <item>HISTORY</item>
+        <item>SETTINGS</item>
+    </string-array>
+
     <string-array name="input_type">
         <item>Manual Entry</item>
         <item>GPS</item>

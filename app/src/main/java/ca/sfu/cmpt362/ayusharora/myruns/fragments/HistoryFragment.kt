@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
 
-//Code adapted from demo code (static fragment)
+//Code adapted from XD's demo code (static fragment)
 class HistoryFragment : Fragment() {
 
     override fun onCreateView(

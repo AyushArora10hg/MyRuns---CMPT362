@@ -13,6 +13,7 @@ import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.activities.ManualInputActivity
 import ca.sfu.cmpt362.ayusharora.myruns.activities.MapDisplayActivity
 
+
 class StartFragment : Fragment() {
 
     private lateinit var inputTypeSpinner: Spinner
@@ -20,6 +21,7 @@ class StartFragment : Fragment() {
     private lateinit var startButton: Button
 
     override fun onCreateView(
+        // Some code taken from XD's demos/lectures.
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
@@ -29,6 +31,13 @@ class StartFragment : Fragment() {
         activityTypeSpinner = ret.findViewById(R.id.start_spinner_activity)
         startButton = ret.findViewById(R.id.start_button_start)
 
+        setupInputSpinner()
+        setupActivitySpinner()
+        handleStartButtonClick()
+
+        return ret
+    }
+    private fun setupInputSpinner(){
         val inputAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -36,7 +45,8 @@ class StartFragment : Fragment() {
         )
         inputAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         inputTypeSpinner.adapter = inputAdapter
-
+    }
+    private fun setupActivitySpinner(){
         val activityAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -44,6 +54,8 @@ class StartFragment : Fragment() {
         )
         activityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         activityTypeSpinner.adapter = activityAdapter
+    }
+    private fun handleStartButtonClick(){
 
         startButton.setOnClickListener {
             when(inputTypeSpinner.selectedItemPosition){
@@ -59,7 +71,5 @@ class StartFragment : Fragment() {
                 }
             }
         }
-
-        return ret
     }
 }

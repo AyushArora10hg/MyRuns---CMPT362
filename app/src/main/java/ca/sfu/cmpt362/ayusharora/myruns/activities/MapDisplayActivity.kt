@@ -7,27 +7,19 @@ import ca.sfu.cmpt362.ayusharora.myruns.R
 
 class MapDisplayActivity: AppCompatActivity() {
 
-    private lateinit var saveButton: Button
-    private lateinit var cancelButton: Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
-
-        setup()
         handleButtonClicks()
-    }
-
-    private fun setup(){
-        saveButton = findViewById(R.id.md_button_save)
-        cancelButton = findViewById(R.id.md_button_cancel)
     }
     private fun handleButtonClicks(){
 
+        val saveButton = findViewById<Button>(R.id.md_button_save)
         saveButton.setOnClickListener {
             finish()
         }
 
+        val cancelButton = findViewById<Button>(R.id.md_button_cancel)
         cancelButton.setOnClickListener {
             finish()
         }

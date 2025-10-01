@@ -1,10 +1,11 @@
-package ca.sfu.cmpt362.ayusharora.myruns.fragments
+package ca.sfu.cmpt362.ayusharora.myruns
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.util.ArrayList
 
+// Code copied from XD's lectures/demos
 class MyFragmentStateAdapter(activity: FragmentActivity, var list: ArrayList<Fragment>)
     : FragmentStateAdapter(activity){
 

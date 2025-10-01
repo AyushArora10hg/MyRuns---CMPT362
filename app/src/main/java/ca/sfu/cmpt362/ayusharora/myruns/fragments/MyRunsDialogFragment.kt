@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
 
+// Code adapted from XD's lecture/demo on dialogs.
 class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     companion object {
         const val DIALOG_TYPE_KEY = "dialogType"
@@ -49,6 +49,7 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
                 requireContext(),android.R.layout.simple_list_item_1,options
             )
             listView.adapter = arrayAdapter
+            // Took help from ChatGpt on how to return something back to caller class.
             listView.setOnItemClickListener { parent, view, position, id ->
                 parentFragmentManager.setFragmentResult(
                     "selectedChoice",
@@ -63,6 +64,6 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
     }
 
     override fun onClick(dialog: DialogInterface?, item: Int) {
-        //TODO: Save to databse/cancel
+        //TODO: Save to database/cancel
     }
 }

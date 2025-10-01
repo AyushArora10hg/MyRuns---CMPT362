@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -20,18 +19,17 @@
         android:translationZ="6dp" />
 
     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/mi_listview"
-        android:layout_below="@id/heading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="24dp"
-        android:layout_alignParentBottom="true">
+        android:layout_marginBottom="24dp">
 
         <Button
             android:id="@+id/mi_button_save"
@@ -58,4 +56,4 @@
             android:layout_marginEnd="10dp"/>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

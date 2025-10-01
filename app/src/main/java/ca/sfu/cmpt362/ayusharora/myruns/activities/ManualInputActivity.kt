@@ -16,8 +16,6 @@ import java.util.Calendar
 class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private lateinit var listView: ListView
-    private lateinit var saveButton: Button
-    private lateinit var cancelButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,15 +25,8 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         handleListItems()
         handleButtonClicks()
     }
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-    }
-
-    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-    }
     private fun setup(){
         listView = findViewById(R.id.mi_listview)
-        saveButton = findViewById(R.id.mi_button_save)
-        cancelButton = findViewById(R.id.mi_button_cancel)
 
         val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this,
@@ -44,6 +35,7 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         )
         listView.adapter = arrayAdapter
     }
+    // Code for date and time dialogs copied from XD's class demos/lectures.
     private fun handleListItems(){
         listView.setOnItemClickListener { parent, view, position, id ->
             when(position){
@@ -74,11 +66,14 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         }
     }
     private fun handleButtonClicks(){
+
+        val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
             //TODO: Save to database
             finish()
         }
 
+        val cancelButton = findViewById<Button>(R.id.mi_button_cancel)
         cancelButton.setOnClickListener {
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
             finish()
@@ -92,5 +87,13 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
         args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, inputType)
         dialog.arguments = args
         dialog.show(supportFragmentManager, tag)
+    }
+
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        //TODO: Save to database
+    }
+
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        //TODO: Save to database
     }
 }

@@ -23,26 +23,21 @@ import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyRunsDialogFragment
 import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
-
-    private lateinit var imageView: ImageView
-    private lateinit var tempImgUri: Uri
-    private val tempImgFileName = "temp_profile_img.jpg"
-    private lateinit var tempImgFile: File
+    private val profileData = "MyRuns_UserProfile"
     private val finalImgFileName = "profile_img.jpg"
-    private lateinit var finalImgFile: File
-    private lateinit var myViewModel: MyViewModel
-    private lateinit var cameraResult: ActivityResultLauncher<Intent>
-    private lateinit var galleryResult: ActivityResultLauncher<Intent>
-    private val PROFILE_DATA = "MyRuns_UserProfile"
-    private lateinit var changeButton: Button
-    private lateinit var saveButton: Button
-    private lateinit var cancelButton: Button
+    private val tempImgFileName = "temp_profile_img.jpg"
     private lateinit var nameEditText: EditText
     private lateinit var emailEditText: EditText
     private lateinit var phoneEditText: EditText
     private lateinit var classEditText: EditText
     private lateinit var majorEditText: EditText
     private lateinit var genderRadioGroup: RadioGroup
+    private lateinit var finalImgFile: File
+    private lateinit var tempImgUri: Uri
+    private lateinit var tempImgFile: File
+    private lateinit var myViewModel: MyViewModel
+    private lateinit var cameraResult: ActivityResultLauncher<Intent>
+    private lateinit var galleryResult: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +48,6 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun setup(){
 
-        imageView = findViewById(R.id.up_image_view)
-        changeButton = findViewById(R.id.up_button_camera)
-        saveButton = findViewById(R.id.up_button_save)
-        cancelButton = findViewById(R.id.up_button_cancel)
         nameEditText = findViewById(R.id.up_edittext_name)
         emailEditText = findViewById(R.id.up_edittext_email)
         phoneEditText = findViewById(R.id.up_edittext_phone)
@@ -65,6 +56,7 @@ class UserProfileActivity : AppCompatActivity() {
         genderRadioGroup = findViewById(R.id.up_radiogroup_gender)
 
         // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)
+        val imageView: ImageView = findViewById(R.id.up_image_view)
         finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
             imageView.setImageURI(Uri.fromFile(finalImgFile))
@@ -105,7 +97,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun loadProfile(){
 
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
+        val sharedPreference = getSharedPreferences(profileData, MODE_PRIVATE)
 
         nameEditText.setText(sharedPreference.getString("name", ""))
         emailEditText.setText(sharedPreference.getString("email", ""))
@@ -122,7 +114,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
     private fun saveProfile(){
 
-        val sharedPreference = getSharedPreferences(PROFILE_DATA, MODE_PRIVATE)
+        val sharedPreference = getSharedPreferences(profileData, MODE_PRIVATE)
         sharedPreference.edit {
             putString("name", nameEditText.text.toString())
             putString("email", emailEditText.text.toString())
@@ -143,6 +135,7 @@ class UserProfileActivity : AppCompatActivity() {
     //The code for this function is derived and extended from lecture 2 demo (CameraDemoKotlin)
     private fun setupButtons(){
 
+        val changeButton : Button = findViewById(R.id.up_button_camera)
         changeButton.setOnClickListener{
 
             val dialog = MyRunsDialogFragment()
@@ -161,6 +154,7 @@ class UserProfileActivity : AppCompatActivity() {
             }
         }
 
+        val saveButton : Button = findViewById(R.id.up_button_save)
         saveButton.setOnClickListener {
             saveProfile()
 
@@ -172,6 +166,7 @@ class UserProfileActivity : AppCompatActivity() {
             finish()
         }
 
+        val cancelButton : Button = findViewById(R.id.up_button_cancel)
         cancelButton.setOnClickListener {
             if (tempImgFile.exists()) tempImgFile.delete()
             finish()
