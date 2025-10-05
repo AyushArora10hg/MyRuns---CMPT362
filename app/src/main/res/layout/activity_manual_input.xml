@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".activities.ManualInputActivity">
 
     <TextView
@@ -22,8 +23,8 @@
         android:id="@+id/mi_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -1,19 +1,14 @@
 package ca.sfu.cmpt362.ayusharora.myruns.activities
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.DatePicker
 import android.widget.ListView
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyRunsDialogFragment
-import java.util.Calendar
-class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+class ManualInputActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
 
@@ -39,29 +34,34 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
     private fun handleListItems(){
         listView.setOnItemClickListener { parent, view, position, id ->
             when(position){
-                0->{
-                    val calendar = Calendar.getInstance()
-                    val datePickerDialog = DatePickerDialog(
-                        this, this, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
-                    )
-                    datePickerDialog.show()
-                }
-                1->{
-                    val calendar = Calendar.getInstance()
-                    val timePickerDialog = TimePickerDialog(
-                        this, this,
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE), true
-                    )
-                    timePickerDialog.show()
-                }
-                2->{showInputDialog("durationDialog", "Duration", android.text.InputType.TYPE_CLASS_NUMBER)}
-                3->{showInputDialog("distanceDialog", "Distance", android.text.InputType.TYPE_CLASS_NUMBER)}
-                4->{showInputDialog("calorieDialog", "Calories", android.text.InputType.TYPE_CLASS_NUMBER)}
-                5->{showInputDialog("heartRateDialog", "Heart Rate", android.text.InputType.TYPE_CLASS_NUMBER)}
-                6->{showInputDialog("commentsDialog", "Comments", android.text.InputType.TYPE_CLASS_TEXT)}
+                0->{ showDateDialog() }
+
+                1->{ showTimeDialog() }
+
+                2->{ showInputDialog("durationDialog",
+                    "Duration (in minutes)",
+                    android.text.InputType.TYPE_CLASS_NUMBER,
+                    "Enter workout duration") }
+
+                3->{ showInputDialog("distanceDialog",
+                    "Distance (mi or km)",
+                    android.text.InputType.TYPE_CLASS_NUMBER,
+                    "Enter distance covered") }
+
+                4->{ showInputDialog("calorieDialog",
+                    "Calories (in kcal)",
+                    android.text.InputType.TYPE_CLASS_NUMBER,
+                    "Enter calories burnt") }
+
+                5->{ showInputDialog("heartRateDialog",
+                    "Heart Rate (average bpm)",
+                    android.text.InputType.TYPE_CLASS_NUMBER,
+                    "Enter average bpm") }
+
+                6->{ showInputDialog("commentsDialog",
+                    "Comments",
+                    android.text.InputType.TYPE_CLASS_TEXT,
+                    "How did your workout go?") }
             }
         }
     }
@@ -79,21 +79,30 @@ class ManualInputActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListe
             finish()
         }
     }
-    private fun showInputDialog(tag: String, title: String, inputType: Int){
+
+    private fun showDateDialog(){
+        val dialog = MyRunsDialogFragment()
+        val args = Bundle()
+        args.putInt(MyRunsDialogFragment.TITLE_KEY, MyRunsDialogFragment.TYPE_DATE)
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, "datePickerDialog")
+    }
+    private fun showTimeDialog(){
+        val dialog = MyRunsDialogFragment()
+        val args = Bundle()
+        args.putInt(MyRunsDialogFragment.TITLE_KEY, MyRunsDialogFragment.TYPE_TIME)
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, "timePickerDialog")
+    }
+    private fun showInputDialog(tag: String, title: String, inputType: Int, hint: String){
         val dialog = MyRunsDialogFragment()
         val args = Bundle()
         args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_INPUT)
         args.putString(MyRunsDialogFragment.TITLE_KEY, title)
         args.putInt(MyRunsDialogFragment.INPUT_TYPE_KEY, inputType)
+        args.putString(MyRunsDialogFragment.HINT_KEY,hint)
         dialog.arguments = args
         dialog.show(supportFragmentManager, tag)
     }
 
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        //TODO: Save to database
-    }
-
-    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        //TODO: Save to database
-    }
 }
