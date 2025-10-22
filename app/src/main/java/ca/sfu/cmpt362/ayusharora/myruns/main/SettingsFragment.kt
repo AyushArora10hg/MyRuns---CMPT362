@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.fragments
+package ca.sfu.cmpt362.ayusharora.myruns.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.activities.UserProfileActivity
+import ca.sfu.cmpt362.ayusharora.myruns.userprofile.UserProfileActivity
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

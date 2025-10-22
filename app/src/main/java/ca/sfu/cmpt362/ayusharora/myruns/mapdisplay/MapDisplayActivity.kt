@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.activities
+package ca.sfu.cmpt362.ayusharora.myruns.mapdisplay
 
 import android.os.Bundle
 import android.widget.Button

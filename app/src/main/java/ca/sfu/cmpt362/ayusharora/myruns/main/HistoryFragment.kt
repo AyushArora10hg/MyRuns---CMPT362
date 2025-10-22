@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.fragments
+package ca.sfu.cmpt362.ayusharora.myruns.main
 
 import android.os.Bundle
 import android.view.LayoutInflater

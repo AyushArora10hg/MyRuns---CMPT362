@@ -1,16 +1,12 @@
-package ca.sfu.cmpt362.ayusharora.myruns.activities
+package ca.sfu.cmpt362.ayusharora.myruns
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import ca.sfu.cmpt362.ayusharora.myruns.fragments.HistoryFragment
-import ca.sfu.cmpt362.ayusharora.myruns.MyFragmentStateAdapter
-import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.fragments.SettingsFragment
-import ca.sfu.cmpt362.ayusharora.myruns.fragments.StartFragment
-import ca.sfu.cmpt362.ayusharora.myruns.Util
+import ca.sfu.cmpt362.ayusharora.myruns.main.HistoryFragment
+import ca.sfu.cmpt362.ayusharora.myruns.main.SettingsFragment
+import ca.sfu.cmpt362.ayusharora.myruns.main.StartFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import java.util.ArrayList

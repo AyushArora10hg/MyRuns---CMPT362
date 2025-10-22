@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns
+package ca.sfu.cmpt362.ayusharora.myruns.userprofile
 
 import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData

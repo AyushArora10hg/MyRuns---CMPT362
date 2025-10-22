@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.activities
+package ca.sfu.cmpt362.ayusharora.myruns.userprofile
 
 import android.content.Intent
 import android.net.Uri
@@ -16,10 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
-import ca.sfu.cmpt362.ayusharora.myruns.MyViewModel
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.Util
-import ca.sfu.cmpt362.ayusharora.myruns.fragments.MyRunsDialogFragment
+import ca.sfu.cmpt362.ayusharora.myruns.manualinput.InputDialogFragment
 import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
@@ -138,11 +137,10 @@ class UserProfileActivity : AppCompatActivity() {
         val changeButton : Button = findViewById(R.id.up_button_camera)
         changeButton.setOnClickListener{
 
-            val dialog = MyRunsDialogFragment()
+            val dialog =OptionDialogFragment()
             val args = Bundle()
-            args.putInt(MyRunsDialogFragment.DIALOG_TYPE_KEY, MyRunsDialogFragment.TYPE_OPTION)
-            args.putString(MyRunsDialogFragment.TITLE_KEY, "Select Profile Image")
-            args.putStringArray(MyRunsDialogFragment.OPTIONS, resources.getStringArray(R.array.user_profile_options))
+            args.putString(InputDialogFragment.Companion.TITLE_KEY, "Select Profile Image")
+            args.putStringArray(OptionDialogFragment.Companion.OPTIONS, resources.getStringArray(R.array.user_profile_options))
             dialog.arguments = args
             dialog.show(supportFragmentManager, "UserProfileDialog")
 
