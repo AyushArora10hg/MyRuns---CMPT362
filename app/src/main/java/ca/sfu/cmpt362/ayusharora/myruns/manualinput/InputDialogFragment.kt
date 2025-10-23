@@ -6,10 +6,8 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.ListView
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
@@ -80,12 +78,29 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        val bundle = Bundle().apply {
+            putInt("selected_year", year)
+            putInt("selected_month", month)
+            putInt("selected_day", dayOfMonth)
+        }
+        parentFragmentManager.setFragmentResult("selected_date", bundle)
     }
 
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        val bundle = Bundle().apply {
+            putInt("selected_hour", hourOfDay)
+            putInt("selected_minute", minute)
+        }
+        parentFragmentManager.setFragmentResult("selected_time", bundle)
     }
 
     override fun onClick(dialog: DialogInterface?, item: Int) {
+        val title = arguments?.getString(TITLE_KEY).toString().lowercase().trim()
+        val editText = view?.findViewById<EditText>(R.id.id_edittext)
+        val bundle = Bundle().apply {
+            putString("user_input", editText?.text.toString())
+        }
+        parentFragmentManager.setFragmentResult("input_$title", bundle)
     }
 
 }
