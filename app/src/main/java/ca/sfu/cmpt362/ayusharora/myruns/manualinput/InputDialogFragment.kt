@@ -25,6 +25,8 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
         const val TYPE_INPUT = 2
     }
 
+    private lateinit var editText: EditText
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val builder = AlertDialog.Builder(requireActivity())
@@ -58,7 +60,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
                     R.layout.fragment_input_dialog,
                     null)
                 val title = arguments?.getString(TITLE_KEY)
-                val editText = view.findViewById<EditText>(R.id.id_edittext)
+                editText = view.findViewById<EditText>(R.id.id_edittext)
                 val inputType = arguments?.getInt(INPUT_TYPE_KEY)
                 if (inputType != null) {
                     editText.inputType = inputType
@@ -96,9 +98,8 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
 
     override fun onClick(dialog: DialogInterface?, item: Int) {
         val title = arguments?.getString(TITLE_KEY).toString().lowercase().trim()
-        val editText = view?.findViewById<EditText>(R.id.id_edittext)
         val bundle = Bundle().apply {
-            putString("user_input", editText?.text.toString())
+            putString("user_input", editText.text.toString())
         }
         parentFragmentManager.setFragmentResult("input_$title", bundle)
     }

@@ -61,13 +61,15 @@ class StartFragment : Fragment() {
             when(inputTypeSpinner.selectedItemPosition){
                 0->{
                     val intent = Intent(requireContext(), ManualInputActivity::class.java)
+                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
-                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItem.toString())
+
                 }
                 1, 2->{
                     val intent = Intent(requireContext(), MapDisplayActivity::class.java)
+                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
-                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItem.toString())
+
                 }
             }
         }

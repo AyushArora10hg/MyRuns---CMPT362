@@ -116,6 +116,7 @@ class ManualInputActivity : AppCompatActivity() {
 
         val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
+            manualInputViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
             manualInputViewModel.insert()
             finish()
         }
