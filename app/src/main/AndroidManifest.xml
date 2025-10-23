@@ -25,7 +25,7 @@
         <activity android:name=".userprofile.UserProfileActivity" />
         <activity android:name=".manualinput.ManualInputActivity" />
         <activity android:name=".mapdisplay.MapDisplayActivity" />
-
+        <activity android:name=".displayentry.DisplayEntryActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="ca.sfu.cmpt362.ayusharora.myruns"

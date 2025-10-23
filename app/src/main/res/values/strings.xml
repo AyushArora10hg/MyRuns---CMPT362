@@ -21,6 +21,7 @@
     <string name="button_negative">CANCEL</string>
     <string name="button_profile_photo">CHANGE</string>
     <string name="button_launch">START</string>
+    <string name="button_delete">DELETE</string>
 
     <string name="spinner_input_type">Input Type</string>
     <string name="spinner_activity_type">Activity Type</string>
