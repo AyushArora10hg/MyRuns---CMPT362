@@ -22,7 +22,7 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
     }
 
     override fun getItemId(position: Int): Long {
-        return position.toLong()
+        return workoutList[position].id
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {

@@ -1,5 +1,6 @@
 package ca.sfu.cmpt362.ayusharora.myruns.main.history
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,8 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabaseDao
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
+import ca.sfu.cmpt362.ayusharora.myruns.displayentry.DisplayEntryActivity
+
 //Code adapted from XD's demo code (static fragment)
 class HistoryFragment : Fragment() {
 
@@ -45,6 +48,13 @@ class HistoryFragment : Fragment() {
         workoutViewModel.allWorkouts.observe(requireActivity(), Observer { it ->
             arrayAdapter.replace(it)
         })
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
+            intent.putExtra("position", position)
+            startActivity(intent)
+            true
+        }
 
         return view
     }

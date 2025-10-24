@@ -27,4 +27,11 @@
     <string name="spinner_activity_type">Activity Type</string>
 
     <string name="link_webpage">https://www.sfu.ca/computing.html</string>
+    <string name="de_textview_input">Input Type</string>
+    <string name="de_textview_activity">Activity Type</string>
+    <string name="de_textview_date_time">Date and Time</string>
+    <string name="de_textview_duration">Duration</string>
+    <string name="de_textview_distance">Distance</string>
+    <string name="de_textview_calories">Calories</string>
+    <string name="de_textview_heart_rate">Heart Rate</string>
 </resources>

@@ -27,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:id = "@+id/de_button_delete"
             android:text="@string/button_delete"
             android:background="?attr/selectableItemBackground"
             android:textColor="@color/black"
@@ -41,12 +42,118 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/app_bar">
 
-        <TextView
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text = "YAPPING TEXT"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_input"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_input"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_activity"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_activity"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_date_time"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_date_time"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_duration"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_duration"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_distance"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_distance"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_calories"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_calories"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "@string/de_textview_heart_rate"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:textSize="17sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id = "@+id/de_edittext_heart_rate"
+                android:inputType="none"
+                android:layout_marginStart="10dp"/>
+
+        </LinearLayout>
 
     </ScrollView>
 

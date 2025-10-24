@@ -25,6 +25,10 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     fun insert(){
         repository.insert(entry)
     }
+
+    fun deleteEntry(id: Long){
+        repository.delete(id)
+    }
 }
 
 class ViewModelFactory(private val repository: WorkoutRepository) : ViewModelProvider.Factory{
