@@ -46,6 +46,7 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
 
     fun replace(newList: List<ExerciseEntry>){
         this.workoutList = newList
+        notifyDataSetChanged()
     }
 
 }

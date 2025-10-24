@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
@@ -14,7 +15,6 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabaseDao
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
-
 //Code adapted from XD's demo code (static fragment)
 class HistoryFragment : Fragment() {
 
@@ -42,20 +42,10 @@ class HistoryFragment : Fragment() {
         viewModelFactory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider (requireActivity(), viewModelFactory)[WorkoutViewModel::class.java]
 
-        workoutViewModel.allWorkouts.observe(viewLifecycleOwner) { workouts ->
-            arrayAdapter.replace(workouts)
-            arrayAdapter.notifyDataSetChanged()
-        }
+        workoutViewModel.allWorkouts.observe(requireActivity(), Observer { it ->
+            arrayAdapter.replace(it)
+        })
 
         return view
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Refresh when tab becomes visible
-        workoutViewModel.allWorkouts.value?.let { workouts ->
-            arrayAdapter.replace(workouts)
-            arrayAdapter.notifyDataSetChanged()
-        }
     }
 }
