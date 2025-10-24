@@ -97,11 +97,12 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     }
 
     override fun onClick(dialog: DialogInterface?, item: Int) {
-        val title = arguments?.getString(TITLE_KEY).toString().lowercase().trim()
-        val bundle = Bundle().apply {
-            putString("user_input", editText.text.toString())
+        if (item == DialogInterface.BUTTON_POSITIVE) {
+            val title = arguments?.getString(TITLE_KEY).toString().lowercase().trim()
+            val bundle = Bundle().apply {
+                putString("user_input", editText.text.toString())
+            }
+            parentFragmentManager.setFragmentResult("input_$title", bundle)
         }
-        parentFragmentManager.setFragmentResult("input_$title", bundle)
     }
-
 }

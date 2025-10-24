@@ -1,11 +1,11 @@
-package ca.sfu.cmpt362.ayusharora.myruns.manualinput
+package ca.sfu.cmpt362.ayusharora.myruns.database
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
-import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
+import androidx.lifecycle.asLiveData
 
-class ManualInputViewModel(private val repository: WorkoutRepository) : ViewModel() {
+class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
     val entry = ExerciseEntry(id = 0,
         inputType = 0,
@@ -20,6 +20,8 @@ class ManualInputViewModel(private val repository: WorkoutRepository) : ViewMode
         comment = ""
     )
 
+    val allWorkouts : LiveData<List<ExerciseEntry>> = repository.allWorkouts.asLiveData()
+
     fun insert(){
         repository.insert(entry)
     }
@@ -27,8 +29,8 @@ class ManualInputViewModel(private val repository: WorkoutRepository) : ViewMode
 
 class ViewModelFactory(private val repository: WorkoutRepository) : ViewModelProvider.Factory{
     override fun<T: ViewModel> create (modelClass: Class<T>) : T{
-        if(modelClass.isAssignableFrom(ManualInputViewModel::class.java))
-            return ManualInputViewModel(repository) as T
+        if(modelClass.isAssignableFrom(WorkoutViewModel::class.java))
+            return WorkoutViewModel(repository) as T
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
