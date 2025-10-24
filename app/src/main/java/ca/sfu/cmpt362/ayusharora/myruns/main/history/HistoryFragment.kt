@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
@@ -49,5 +48,14 @@ class HistoryFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh when tab becomes visible
+        workoutViewModel.allWorkouts.value?.let { workouts ->
+            arrayAdapter.replace(workouts)
+            arrayAdapter.notifyDataSetChanged()
+        }
     }
 }
