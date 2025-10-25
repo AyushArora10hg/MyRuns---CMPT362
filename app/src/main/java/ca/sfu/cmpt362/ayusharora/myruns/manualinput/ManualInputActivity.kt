@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.database.ViewModelFactory
@@ -20,8 +21,9 @@ class ManualInputActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
     private lateinit var workoutViewModel: WorkoutViewModel
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var unitSharedPreference: SharedPreferences
     private lateinit var unitArray: Array <String>
+    private lateinit var dialogSharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,8 @@ class ManualInputActivity : AppCompatActivity() {
         val repository = WorkoutRepository(dao)
         val factory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        unitSharedPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        dialogSharedPreferences = getSharedPreferences("dialogData", MODE_PRIVATE)
         unitArray= resources.getStringArray(R.array.unit_values)
     }
     // Code for date and time dialogs copied from XD's class demos/lectures.
@@ -61,38 +64,43 @@ class ManualInputActivity : AppCompatActivity() {
                     "Duration",
                     "(in min)",
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-                    "Enter workout duration") }
+                    "Enter workout duration",
+                    dialogSharedPreferences.getString("duration", ""))
+                }
 
                 3->{
-                    var unit = sharedPreferences.getString("unit_preference",unitArray[0])
+                    var unit = unitSharedPreference.getString("unit_preference",unitArray[0])
                     if (unit == unitArray[0]){
                         unit = "kilometers"
                     } else if (unit == unitArray[1]){
                         unit = "miles"
                     }
                     showInputDialog("distanceDialog",
-                    "Distance",
-                        "(in $unit)",
+                    "Distance", "(in $unit)",
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-                    "Enter distance covered") }
+                    "Enter distance covered",
+                        dialogSharedPreferences.getString("distance", "")) }
 
                 4->{ showInputDialog("calorieDialog",
                     "Calories",
                     "(in kcal)",
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-                    "Enter calories burnt") }
+                    "Enter calories burnt",
+                    dialogSharedPreferences.getString("calories", "")) }
 
                 5->{ showInputDialog("heartRateDialog",
                     "Heart Rate",
                     "(in bpm)",
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-                    "Enter average bpm") }
+                    "Enter average bpm",
+                    dialogSharedPreferences.getString("heartRate", "")) }
 
                 6->{ showInputDialog("commentsDialog",
                     "Comments",
                     "",
                     InputType.TYPE_CLASS_TEXT,
-                    "How did your workout go?") }
+                    "How did your workout go?",
+                    dialogSharedPreferences.getString("comments", "")) }
             }
         }
     }
@@ -105,26 +113,41 @@ class ManualInputActivity : AppCompatActivity() {
         supportFragmentManager.setFragmentResultListener("input_duration", this){_, bundle->
             val value = bundle.getString("user_input")
             workoutViewModel.entry.duration = value?.toDoubleOrNull()?:0.0
+            dialogSharedPreferences.edit{
+                putString("duration", value)
+            }
         }
         //Distance
         supportFragmentManager.setFragmentResultListener("input_distance", this){_, bundle->
             val value = bundle.getString("user_input")
             workoutViewModel.entry.distance = value?.toDoubleOrNull()?:0.0
+            dialogSharedPreferences.edit{
+                putString("distance", value)
+            }
         }
         //Calories
         supportFragmentManager.setFragmentResultListener("input_calories", this){_, bundle->
             val value = bundle.getString("user_input")
             workoutViewModel.entry.calorie = value?.toDoubleOrNull()?:0.0
+            dialogSharedPreferences.edit{
+                putString("calories", value)
+            }
         }
         //Heart Rate
         supportFragmentManager.setFragmentResultListener("input_heart rate", this){_, bundle->
             val value = bundle.getString("user_input")
             workoutViewModel.entry.heartRate = value?.toDoubleOrNull()?:0.0
+            dialogSharedPreferences.edit{
+                putString("heartRate", value)
+            }
         }
         //Comments
         supportFragmentManager.setFragmentResultListener("input_comments", this){_, bundle->
             val value = bundle.getString("user_input")
             workoutViewModel.entry.comment = value?: ""
+            dialogSharedPreferences.edit{
+                putString("comments", value)
+            }
         }
     }
 
@@ -133,17 +156,25 @@ class ManualInputActivity : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
             workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
-            val unit = sharedPreferences.getString("unit_preference", unitArray[0])
+            val unit = unitSharedPreference.getString("unit_preference", unitArray[0])
             if (unit == unitArray[1]){
                 workoutViewModel.entry.distance = "%.2f".format(workoutViewModel.entry.distance * 1.6094).toDouble()
             }
             workoutViewModel.insert()
+            dialogSharedPreferences.edit {
+                clear()
+                apply()
+            }
             finish()
         }
 
         val cancelButton = findViewById<Button>(R.id.mi_button_cancel)
         cancelButton.setOnClickListener {
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
+            dialogSharedPreferences.edit {
+                clear()
+                apply()
+            }
             finish()
         }
     }
@@ -151,27 +182,33 @@ class ManualInputActivity : AppCompatActivity() {
     private fun showDateDialog(){
         val dialog = InputDialogFragment()
         val args = Bundle()
-        args.putInt(InputDialogFragment.Companion.DIALOG_TYPE_KEY, InputDialogFragment.Companion.TYPE_DATE)
+        args.putInt(InputDialogFragment.DIALOG_TYPE_KEY, InputDialogFragment.TYPE_DATE)
         dialog.arguments = args
         dialog.show(supportFragmentManager, "datePickerDialog")
     }
     private fun showTimeDialog(){
         val dialog = InputDialogFragment()
         val args = Bundle()
-        args.putInt(InputDialogFragment.Companion.DIALOG_TYPE_KEY, InputDialogFragment.Companion.TYPE_TIME)
+        args.putInt(InputDialogFragment.DIALOG_TYPE_KEY, InputDialogFragment.TYPE_TIME)
         dialog.arguments = args
         dialog.show(supportFragmentManager, "timePickerDialog")
     }
-    private fun showInputDialog(tag: String, title: String, unit: String?, inputType: Int, hint: String){
+    private fun showInputDialog(tag: String, title: String, unit: String?, inputType: Int, hint: String, text: String?){
         val dialog = InputDialogFragment()
         val args = Bundle()
-        args.putInt(InputDialogFragment.Companion.DIALOG_TYPE_KEY, InputDialogFragment.Companion.TYPE_INPUT)
-        args.putString(InputDialogFragment.Companion.TITLE_KEY, title)
-        args.putString(InputDialogFragment.Companion.UNIT_KEY, unit)
-        args.putInt(InputDialogFragment.Companion.INPUT_TYPE_KEY, inputType)
-        args.putString(InputDialogFragment.Companion.HINT_KEY,hint)
+        args.putInt(InputDialogFragment.DIALOG_TYPE_KEY, InputDialogFragment.TYPE_INPUT)
+        args.putString(InputDialogFragment.TITLE_KEY, title)
+        args.putString(InputDialogFragment.UNIT_KEY, unit)
+        args.putInt(InputDialogFragment.INPUT_TYPE_KEY, inputType)
+        args.putString(InputDialogFragment.HINT_KEY,hint)
+        args.putString(InputDialogFragment.DEFAULT_TEXT_KEY, text)
         dialog.arguments = args
         dialog.show(supportFragmentManager, tag)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
     }
 
 }

@@ -21,6 +21,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
         const val UNIT_KEY = "unit"
         const val INPUT_TYPE_KEY = "inputType"
         const val HINT_KEY = "editTextHint"
+        const val DEFAULT_TEXT_KEY = "defaultText"
         const val TYPE_DATE = 0
         const val TYPE_TIME = 1
         const val TYPE_INPUT = 2
@@ -71,6 +72,8 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
                 if (hint != null) {
                     editText.setHint(hint)
                 }
+                val text = arguments?.getString(DEFAULT_TEXT_KEY)
+                editText.setText(text)
                 builder.setView(view)
                 builder.setTitle("$title $unit")
                 builder.setPositiveButton("Save", this)
