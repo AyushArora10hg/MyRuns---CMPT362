@@ -4,7 +4,7 @@ package ca.sfu.cmpt362.ayusharora.myruns.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Calendar
+import android.icu.util.Calendar
 
 @Entity(tableName = "workout_data")
 data class ExerciseEntry (

@@ -7,7 +7,8 @@ import androidx.lifecycle.asLiveData
 
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
-    val entry = ExerciseEntry(id = 0,
+    val entry = ExerciseEntry(
+        id = 0,
         inputType = 0,
         activityType = 0,
         duration = 0.0,

@@ -24,6 +24,7 @@ class ManualInputActivity : AppCompatActivity() {
     private lateinit var unitSharedPreference: SharedPreferences
     private lateinit var unitArray: Array <String>
     private lateinit var dialogSharedPreferences: SharedPreferences
+    private var shouldShowToast = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +34,14 @@ class ManualInputActivity : AppCompatActivity() {
         handleListItems()
         handleDialogInputs()
         handleButtonClicks()
+
+        workoutViewModel.allWorkouts.observe(this) { workouts ->
+            if (shouldShowToast && workouts.isNotEmpty()) {
+                val lastEntry = workouts.last()
+                Toast.makeText(this, "Entry #${lastEntry.id} saved!", Toast.LENGTH_SHORT).show()
+                shouldShowToast = false
+            }
+        }
     }
     private fun setup(){
         listView = findViewById(R.id.mi_listview)
@@ -165,6 +174,7 @@ class ManualInputActivity : AppCompatActivity() {
                 clear()
                 apply()
             }
+            shouldShowToast = true
             finish()
         }
 
@@ -186,6 +196,7 @@ class ManualInputActivity : AppCompatActivity() {
         dialog.arguments = args
         dialog.show(supportFragmentManager, "datePickerDialog")
     }
+
     private fun showTimeDialog(){
         val dialog = InputDialogFragment()
         val args = Bundle()
@@ -193,6 +204,7 @@ class ManualInputActivity : AppCompatActivity() {
         dialog.arguments = args
         dialog.show(supportFragmentManager, "timePickerDialog")
     }
+
     private fun showInputDialog(tag: String, title: String, unit: String?, inputType: Int, hint: String, text: String?){
         val dialog = InputDialogFragment()
         val args = Bundle()
@@ -204,11 +216,6 @@ class ManualInputActivity : AppCompatActivity() {
         args.putString(InputDialogFragment.DEFAULT_TEXT_KEY, text)
         dialog.arguments = args
         dialog.show(supportFragmentManager, tag)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
     }
 
 }
