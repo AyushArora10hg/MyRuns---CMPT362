@@ -10,12 +10,9 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import kotlin.math.floor
 
+//Custom adapter inflating two text views to each entry of a ListView
+// Code adapted from XD's lecture demos
 class HistoryAdapter (private val context: Context, private var workoutList: List<ExerciseEntry>) : BaseAdapter(){
-
-    private val inputTypeArray = context.resources.getStringArray(R.array.input_type)
-    private val activityTypeArray = context.resources.getStringArray(R.array.activity_type)
-    private val unitArray = context.resources.getStringArray(R.array.unit_values)
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun getCount(): Int {
         return workoutList.size
@@ -29,23 +26,33 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
         return workoutList[position].id
     }
 
+    // This method grabs all activity details and retrieves there attributes to display
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
 
         val view = View.inflate(context, R.layout.adapter_fragment_history, null)
-        val firstRow = view.findViewById<TextView>(R.id.adapter_first_row)
-        val secondRow = view.findViewById<TextView>(R.id.adapter_second_row)
-
         val currentEntry = workoutList[position]
 
+        // inputType
+        val inputTypeArray = context.resources.getStringArray(R.array.input_type)
         val inputType = inputTypeArray[currentEntry.inputType]
+
+        // activityType
+        val activityTypeArray = context.resources.getStringArray(R.array.activity_type)
         val activityType = activityTypeArray[currentEntry.activityType]
+
+        //dateTime
         val time = "9:01:45"
         val date = "Oct 23 2025"
+
+        //duration
         val duration = currentEntry.duration
         val min = floor(duration).toInt()
         val sec = ((duration - min) * 60).toInt()
-        var distance = currentEntry.distance
 
+        //distance
+        var distance = currentEntry.distance
+        val unitArray = context.resources.getStringArray(R.array.unit_values)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         var unit = sharedPreferences.getString("unit_preference", unitArray[0])
         if (unit == unitArray[0]){
             unit = "km"
@@ -54,12 +61,16 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
             distance = "%.3f".format(distance / 1.6094).toDouble()
         }
 
+        // TextViews
+        val firstRow = view.findViewById<TextView>(R.id.adapter_first_row)
         firstRow.text = "$inputType: $activityType, $time $date"
+        val secondRow = view.findViewById<TextView>(R.id.adapter_second_row)
         secondRow.text = "$min min $sec sec, $distance $unit"
 
         return view
     }
 
+    // Update the local copy of database entry array with a new one and update the display
     fun replace(newList: List<ExerciseEntry>){
         this.workoutList = newList
         notifyDataSetChanged()

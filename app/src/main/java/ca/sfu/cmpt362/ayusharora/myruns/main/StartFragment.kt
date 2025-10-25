@@ -18,25 +18,22 @@ class StartFragment : Fragment() {
 
     private lateinit var inputTypeSpinner: Spinner
     private lateinit var activityTypeSpinner: Spinner
-    private lateinit var startButton: Button
 
-    override fun onCreateView(
-        // Some code taken from XD's demos/lectures.
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val ret =  inflater.inflate(R.layout.fragment_start, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view =  inflater.inflate(R.layout.fragment_start, container, false)
 
-        inputTypeSpinner = ret.findViewById(R.id.start_spinner_input)
-        activityTypeSpinner = ret.findViewById(R.id.start_spinner_activity)
-        startButton = ret.findViewById(R.id.start_button_start)
-
+        inputTypeSpinner = view.findViewById(R.id.start_spinner_input)
         setupInputSpinner()
-        setupActivitySpinner()
-        handleStartButtonClick()
 
-        return ret
+        activityTypeSpinner = view.findViewById(R.id.start_spinner_activity)
+        setupActivitySpinner()
+
+        handleStartButtonClick(view)
+
+        return view
     }
+
+    // This helper method loads values of input types listed in arrays.xml to a spinner using adapter
     private fun setupInputSpinner(){
         val inputAdapter = ArrayAdapter(
             requireContext(),
@@ -46,6 +43,8 @@ class StartFragment : Fragment() {
         inputAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         inputTypeSpinner.adapter = inputAdapter
     }
+
+    // This helper method loads values of activity types listed in arrays.xml to a spinner using adapter
     private fun setupActivitySpinner(){
         val activityAdapter = ArrayAdapter(
             requireContext(),
@@ -55,8 +54,11 @@ class StartFragment : Fragment() {
         activityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         activityTypeSpinner.adapter = activityAdapter
     }
-    private fun handleStartButtonClick(){
 
+    // Start button handler to launch new activities based on values of spinners
+    private fun handleStartButtonClick(view:View){
+
+        val startButton = view.findViewById<Button>(R.id.start_button_start)
         startButton.setOnClickListener {
             when(inputTypeSpinner.selectedItemPosition){
                 0->{
