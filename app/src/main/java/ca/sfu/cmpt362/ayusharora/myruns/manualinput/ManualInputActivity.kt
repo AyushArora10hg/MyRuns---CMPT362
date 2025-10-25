@@ -128,6 +128,10 @@ class ManualInputActivity : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
             workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+            val unit = sharedPreferences.getString("unit_preference", unitArray[0])
+            if (unit == unitArray[1]){
+                workoutViewModel.entry.distance = "%.2f".format(workoutViewModel.entry.distance * 1.6094).toDouble()
+            }
             workoutViewModel.insert()
             finish()
         }

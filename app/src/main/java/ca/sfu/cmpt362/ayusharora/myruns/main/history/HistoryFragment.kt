@@ -1,6 +1,7 @@
 package ca.sfu.cmpt362.ayusharora.myruns.main.history
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.database.ViewModelFactory
@@ -30,6 +32,13 @@ class HistoryFragment : Fragment() {
     private lateinit var repository: WorkoutRepository
     private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var workoutViewModel: WorkoutViewModel
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        if (key == "unit_preference") {
+            arrayAdapter.notifyDataSetChanged()
+        }
+    }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(R.layout.fragment_history, container, false)
@@ -56,6 +65,14 @@ class HistoryFragment : Fragment() {
             true
         }
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+        sharedPreferences.registerOnSharedPreferenceChangeListener (preferenceChangeListener)
+
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 }
