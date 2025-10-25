@@ -4,7 +4,9 @@ package ca.sfu.cmpt362.ayusharora.myruns.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import android.icu.util.Calendar
+
+
+// Code adapted from XD's demo lectures
 
 @Entity(tableName = "workout_data")
 data class ExerciseEntry (
@@ -44,6 +46,5 @@ data class ExerciseEntry (
 
     @ColumnInfo(name = "comment")
     var comment: String                         // Comments
-
 
 )

@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+// Database implementing RoomDatabase
+// Code adapted from Xd's lecture demos
 @Database(entities = [ExerciseEntry::class], version = 1)
 abstract class WorkoutDatabase: RoomDatabase() {
 

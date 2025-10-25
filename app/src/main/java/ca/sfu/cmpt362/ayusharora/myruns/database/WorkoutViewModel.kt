@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 
+// View Model
+// Code adapted from XD's demo lectures
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
     val entry = ExerciseEntry(

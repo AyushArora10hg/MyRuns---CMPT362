@@ -1,12 +1,9 @@
 package ca.sfu.cmpt362.ayusharora.myruns.displayentry
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
@@ -20,88 +17,92 @@ import kotlin.math.floor
 
 class DisplayEntryActivity () : AppCompatActivity() {
 
-    private lateinit var inputTypeEditText: EditText
-    private lateinit var activityTypeEditText: EditText
-    private lateinit var dateAndTimeEditText: EditText
-    private lateinit var durationEditText: EditText
-    private lateinit var distanceEditText: EditText
-    private lateinit var caloriesEditText: EditText
-    private lateinit var heartRateEditText: EditText
-    private lateinit var commentsEditText: EditText
-    private lateinit var deleteButton : Button
+    // The workout to be displayed by this activity
+    private lateinit var entry: ExerciseEntry
 
+    // Database objects
     private lateinit var db : WorkoutDatabase
     private lateinit var dao : WorkoutDatabaseDao
     private lateinit var repository: WorkoutRepository
     private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var workoutViewModel: WorkoutViewModel
 
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var unitArray: Array <String>
-
-    private lateinit var entry: ExerciseEntry
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_display_entry)
 
-        val inputTypeArray = resources.getStringArray(R.array.input_type)
-        val activityTypeArray = resources.getStringArray(R.array.activity_type)
+        loadDataBase()
+        setupActivityDisplay()
+        handleButtonClick()
+    }
 
+    // This helper method loads the database following proper MVVM structure
+    // Code adapted from XD's lecture demos
+    private fun loadDataBase(){
         db = WorkoutDatabase.getInstance(this)
         dao = db.workoutDatabaseDao
         repository = WorkoutRepository(dao)
         viewModelFactory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider (this, viewModelFactory)[WorkoutViewModel::class.java]
+    }
 
+    // This helper method gets the activity tapped by user in history fragment via intent
+    // It grabs all the attributes of that activity from database and displays them
+    private fun setupActivityDisplay(){
 
-        inputTypeEditText = findViewById(R.id.de_edittext_input)
-        activityTypeEditText = findViewById(R.id.de_edittext_activity)
-        dateAndTimeEditText = findViewById(R.id.de_edittext_date_time)
-        durationEditText = findViewById(R.id.de_edittext_duration)
-        distanceEditText = findViewById(R.id.de_edittext_distance)
-        caloriesEditText = findViewById(R.id.de_edittext_calories)
-        heartRateEditText = findViewById(R.id.de_edittext_heart_rate)
-        commentsEditText = findViewById(R.id.de_edittext_comments)
-
-        unitArray = resources.getStringArray(R.array.unit_values)
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
+        val inputTypeArray = resources.getStringArray(R.array.input_type)
+        val activityTypeArray = resources.getStringArray(R.array.activity_type)
+        val unitArray = resources.getStringArray(R.array.unit_values)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val pos = intent.getIntExtra("position", -1)
+
         workoutViewModel.allWorkouts.observe(this) { workouts ->
             if (pos == -1 || pos < workouts.size) {
                 entry = workouts[pos]
+
+                // Units for distance
                 var unit = sharedPreferences.getString("unit_preference", unitArray[0])
-                var displayDistance: String? = null
+                var displayDistance = 0.0
                 if (unit == unitArray[0]) {
                     unit = "km"
-                    displayDistance = "%.3f".format(entry.distance)
-
-                } else if (unit == unitArray[1]) {
-                    unit = "mi"
-                    displayDistance = "%.3f".format(entry.distance / 1.6094)
+                    displayDistance = entry.distance
                 }
-
+                else if (unit == unitArray[1]) {
+                    unit = "mi"
+                    displayDistance = (entry.distance / 1.6094)
+                }
+                // Time format
                 val duration = entry.duration
                 val min = floor(duration).toInt()
                 val sec = ((duration - min) * 60).toInt()
 
+                // Add Data to all edit texts
+                val inputTypeEditText = findViewById<EditText>(R.id.de_edittext_input)
                 inputTypeEditText.setText(inputTypeArray[entry.inputType])
+                val activityTypeEditText = findViewById<EditText>(R.id.de_edittext_activity)
                 activityTypeEditText.setText(activityTypeArray[entry.activityType])
+                val dateAndTimeEditText = findViewById<EditText>(R.id.de_edittext_date_time)
                 dateAndTimeEditText.setText("9:12:32 Oct 23 2025")
+                val durationEditText = findViewById<EditText>(R.id.de_edittext_duration)
                 durationEditText.setText("$min min $sec sec")
-                distanceEditText.setText("$displayDistance $unit")
-                caloriesEditText.setText(entry.calorie.toString())
-                heartRateEditText.setText(entry.heartRate.toString())
+                val distanceEditText = findViewById<EditText>(R.id.de_edittext_distance)
+                distanceEditText.setText("%.3f".format(displayDistance) + " $unit")
+                val caloriesEditText = findViewById<EditText>(R.id.de_edittext_calories)
+                caloriesEditText.setText("%.2f".format(entry.calorie) + " kcal")
+                val heartRateEditText = findViewById<EditText>(R.id.de_edittext_heart_rate)
+                heartRateEditText.setText("%.2f".format(entry.heartRate) + " bpm")
+                val commentsEditText = findViewById<EditText>(R.id.de_edittext_comments)
                 commentsEditText.setText(entry.comment)
             }
         }
+    }
 
-        deleteButton = findViewById(R.id.de_button_delete)
+    private fun handleButtonClick() {
+
+        val deleteButton : Button = findViewById(R.id.de_button_delete)
         deleteButton.setOnClickListener {
             workoutViewModel.deleteEntry(entry.id)
             finish()
         }
-
     }
 }
