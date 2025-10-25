@@ -16,6 +16,7 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabaseDao
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
+import kotlin.math.floor
 
 class DisplayEntryActivity () : AppCompatActivity() {
 
@@ -78,10 +79,15 @@ class DisplayEntryActivity () : AppCompatActivity() {
                     unit = "mi"
                     displayDistance = "%.3f".format(entry.distance / 1.6094)
                 }
+
+                val duration = entry.duration
+                val min = floor(duration).toInt()
+                val sec = ((duration - min) * 60).toInt()
+
                 inputTypeEditText.setText(inputTypeArray[entry.inputType])
                 activityTypeEditText.setText(activityTypeArray[entry.activityType])
                 dateAndTimeEditText.setText("9:12:32 Oct 23 2025")
-                durationEditText.setText(entry.duration.toString())
+                durationEditText.setText("$min min $sec sec")
                 distanceEditText.setText("$displayDistance $unit")
                 caloriesEditText.setText(entry.calorie.toString())
                 heartRateEditText.setText(entry.heartRate.toString())

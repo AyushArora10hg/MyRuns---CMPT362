@@ -60,27 +60,32 @@ class ManualInputActivity : AppCompatActivity() {
                 2->{ showInputDialog("durationDialog",
                     "Duration",
                     "(in min)",
-                    InputType.TYPE_CLASS_NUMBER,
+                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
                     "Enter workout duration") }
 
                 3->{
-                    val unit = sharedPreferences.getString("unit_preference",unitArray[0])
+                    var unit = sharedPreferences.getString("unit_preference",unitArray[0])
+                    if (unit == unitArray[0]){
+                        unit = "kilometers"
+                    } else if (unit == unitArray[1]){
+                        unit = "miles"
+                    }
                     showInputDialog("distanceDialog",
                     "Distance",
                         "(in $unit)",
-                    InputType.TYPE_CLASS_NUMBER,
+                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
                     "Enter distance covered") }
 
                 4->{ showInputDialog("calorieDialog",
                     "Calories",
                     "(in kcal)",
-                    InputType.TYPE_CLASS_NUMBER,
+                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
                     "Enter calories burnt") }
 
                 5->{ showInputDialog("heartRateDialog",
                     "Heart Rate",
                     "(in bpm)",
-                    InputType.TYPE_CLASS_NUMBER,
+                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
                     "Enter average bpm") }
 
                 6->{ showInputDialog("commentsDialog",

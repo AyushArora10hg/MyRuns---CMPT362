@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.userprofile.UserProfileActivity
 
@@ -12,6 +13,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         this.addPreferencesFromResource(R.xml.preference)
+
+        PreferenceManager.setDefaultValues(requireContext(), R.xml.preference, false)
 
         val userProfilePreference = findPreference<Preference>("user_profile_preference")
         userProfilePreference?.setOnPreferenceClickListener {

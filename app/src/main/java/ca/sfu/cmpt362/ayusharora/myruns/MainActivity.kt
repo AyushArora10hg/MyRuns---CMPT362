@@ -3,6 +3,7 @@ package ca.sfu.cmpt362.ayusharora.myruns
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import ca.sfu.cmpt362.ayusharora.myruns.main.history.HistoryFragment
 import ca.sfu.cmpt362.ayusharora.myruns.main.SettingsFragment

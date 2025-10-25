@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import kotlin.math.floor
 
 class HistoryAdapter (private val context: Context, private var workoutList: List<ExerciseEntry>) : BaseAdapter(){
 
@@ -41,6 +42,8 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
         val time = "9:01:45"
         val date = "Oct 23 2025"
         val duration = currentEntry.duration
+        val min = floor(duration).toInt()
+        val sec = ((duration - min) * 60).toInt()
         var distance = currentEntry.distance
 
         var unit = sharedPreferences.getString("unit_preference", unitArray[0])
@@ -52,7 +55,7 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
         }
 
         firstRow.text = "$inputType: $activityType, $time $date"
-        secondRow.text = "$duration, $distance $unit"
+        secondRow.text = "$min min $sec sec, $distance $unit"
 
         return view
     }
