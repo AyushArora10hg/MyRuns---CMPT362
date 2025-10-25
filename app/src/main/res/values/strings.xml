@@ -34,4 +34,5 @@
     <string name="de_textview_distance">Distance</string>
     <string name="de_textview_calories">Calories</string>
     <string name="de_textview_heart_rate">Heart Rate</string>
+    <string name="de_textview_comments">Comments</string>
 </resources>

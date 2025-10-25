@@ -27,6 +27,7 @@ class DisplayEntryActivity () : AppCompatActivity() {
     private lateinit var distanceEditText: EditText
     private lateinit var caloriesEditText: EditText
     private lateinit var heartRateEditText: EditText
+    private lateinit var commentsEditText: EditText
     private lateinit var deleteButton : Button
 
     private lateinit var db : WorkoutDatabase
@@ -61,6 +62,7 @@ class DisplayEntryActivity () : AppCompatActivity() {
         distanceEditText = findViewById(R.id.de_edittext_distance)
         caloriesEditText = findViewById(R.id.de_edittext_calories)
         heartRateEditText = findViewById(R.id.de_edittext_heart_rate)
+        commentsEditText = findViewById(R.id.de_edittext_comments)
 
         unitArray = resources.getStringArray(R.array.unit_values)
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -91,6 +93,7 @@ class DisplayEntryActivity () : AppCompatActivity() {
                 distanceEditText.setText("$displayDistance $unit")
                 caloriesEditText.setText(entry.calorie.toString())
                 heartRateEditText.setText(entry.heartRate.toString())
+                commentsEditText.setText(entry.comment)
             }
         }
 
