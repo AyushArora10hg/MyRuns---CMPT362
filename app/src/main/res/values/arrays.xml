@@ -6,8 +6,8 @@
     </string-array>
 
     <string-array name="unit_values">
-        <item>metric</item>
-        <item>imperial</item>
+        <item>kilometers</item>
+        <item>miles</item>
     </string-array>
 
     <string-array name="main_tab_titles">

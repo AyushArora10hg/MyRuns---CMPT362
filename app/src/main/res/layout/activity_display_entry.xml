@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_input"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -76,6 +77,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_activity"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -91,6 +93,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_date_time"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -106,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_duration"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -121,6 +125,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_distance"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -136,6 +141,7 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_calories"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
             <TextView
@@ -151,11 +157,11 @@
                 android:layout_height="wrap_content"
                 android:id = "@+id/de_edittext_heart_rate"
                 android:inputType="none"
+                android:focusable="false"
                 android:layout_marginStart="10dp"/>
 
         </LinearLayout>
 
     </ScrollView>
-
 
 </RelativeLayout>

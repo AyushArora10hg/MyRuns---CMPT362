@@ -18,6 +18,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     companion object {
         const val DIALOG_TYPE_KEY = "dialogType"
         const val TITLE_KEY = "title"
+        const val UNIT_KEY = "unit"
         const val INPUT_TYPE_KEY = "inputType"
         const val HINT_KEY = "editTextHint"
         const val TYPE_DATE = 0
@@ -60,6 +61,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
                     R.layout.fragment_input_dialog,
                     null)
                 val title = arguments?.getString(TITLE_KEY)
+                val unit = arguments?.getString(UNIT_KEY)
                 editText = view.findViewById<EditText>(R.id.id_edittext)
                 val inputType = arguments?.getInt(INPUT_TYPE_KEY)
                 if (inputType != null) {
@@ -70,7 +72,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
                     editText.setHint(hint)
                 }
                 builder.setView(view)
-                builder.setTitle(title)
+                builder.setTitle("$title $unit")
                 builder.setPositiveButton("Save", this)
                 builder.setNegativeButton("Cancel", this)
                 dialog = builder.create()

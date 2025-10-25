@@ -1,6 +1,8 @@
 package ca.sfu.cmpt362.ayusharora.myruns.manualinput
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.preference.PreferenceManager
 import android.text.InputType
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -18,6 +20,8 @@ class ManualInputActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
     private lateinit var workoutViewModel: WorkoutViewModel
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var unitArray: Array <String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,8 @@ class ManualInputActivity : AppCompatActivity() {
         val repository = WorkoutRepository(dao)
         val factory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        unitArray= resources.getStringArray(R.array.unit_values)
     }
     // Code for date and time dialogs copied from XD's class demos/lectures.
     private fun handleListItems(){
@@ -53,26 +59,33 @@ class ManualInputActivity : AppCompatActivity() {
 
                 2->{ showInputDialog("durationDialog",
                     "Duration",
+                    "(in min)",
                     InputType.TYPE_CLASS_NUMBER,
                     "Enter workout duration") }
 
-                3->{ showInputDialog("distanceDialog",
+                3->{
+                    val unit = sharedPreferences.getString("unit_preference",unitArray[0])
+                    showInputDialog("distanceDialog",
                     "Distance",
+                        "(in $unit)",
                     InputType.TYPE_CLASS_NUMBER,
                     "Enter distance covered") }
 
                 4->{ showInputDialog("calorieDialog",
                     "Calories",
+                    "(in kcal)",
                     InputType.TYPE_CLASS_NUMBER,
                     "Enter calories burnt") }
 
                 5->{ showInputDialog("heartRateDialog",
                     "Heart Rate",
+                    "(in bpm)",
                     InputType.TYPE_CLASS_NUMBER,
                     "Enter average bpm") }
 
                 6->{ showInputDialog("commentsDialog",
                     "Comments",
+                    "",
                     InputType.TYPE_CLASS_TEXT,
                     "How did your workout go?") }
             }
@@ -122,19 +135,6 @@ class ManualInputActivity : AppCompatActivity() {
         val cancelButton = findViewById<Button>(R.id.mi_button_cancel)
         cancelButton.setOnClickListener {
             Toast.makeText(this, "Entry Discarded", Toast.LENGTH_SHORT).show()
-            workoutViewModel.entry.apply {
-                id = 0
-                inputType = 0
-                activityType = 0
-                duration = 0.0
-                distance = 0.0
-                avgPace = 0.0
-                avgSpeed = 0.0
-                calorie = 0.0
-                climb = 0.0
-                heartRate = 0.0
-                comment = ""
-            }
             finish()
         }
     }
@@ -153,11 +153,12 @@ class ManualInputActivity : AppCompatActivity() {
         dialog.arguments = args
         dialog.show(supportFragmentManager, "timePickerDialog")
     }
-    private fun showInputDialog(tag: String, title: String, inputType: Int, hint: String){
+    private fun showInputDialog(tag: String, title: String, unit: String?, inputType: Int, hint: String){
         val dialog = InputDialogFragment()
         val args = Bundle()
         args.putInt(InputDialogFragment.Companion.DIALOG_TYPE_KEY, InputDialogFragment.Companion.TYPE_INPUT)
         args.putString(InputDialogFragment.Companion.TITLE_KEY, title)
+        args.putString(InputDialogFragment.Companion.UNIT_KEY, unit)
         args.putInt(InputDialogFragment.Companion.INPUT_TYPE_KEY, inputType)
         args.putString(InputDialogFragment.Companion.HINT_KEY,hint)
         dialog.arguments = args
