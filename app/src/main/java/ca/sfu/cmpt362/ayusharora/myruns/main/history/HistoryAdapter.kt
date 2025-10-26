@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.Util
 import kotlin.math.floor
 
 //Custom adapter inflating two text views to each entry of a ListView
@@ -41,13 +42,10 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
         val activityType = activityTypeArray[currentEntry.activityType]
 
         //dateTime
-        val time = "9:01:45"
-        val date = "Oct 23 2025"
+        val dateTime = currentEntry.dateTime
 
         //duration
         val duration = currentEntry.duration
-        val min = floor(duration).toInt()
-        val sec = ((duration - min) * 60).toInt()
 
         //distance
         var distance = currentEntry.distance
@@ -58,14 +56,14 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
             unit = "km"
         } else if (unit == unitArray[1]){
             unit = "mi"
-            distance = "%.3f".format(distance / 1.6094).toDouble()
+            distance = Util.convertKilometersToMiles(distance)
         }
 
         // TextViews
         val firstRow = view.findViewById<TextView>(R.id.adapter_first_row)
-        firstRow.text = "$inputType: $activityType, $time $date"
+        firstRow.text = "$inputType: $activityType, ${Util.formatDateTime(dateTime)}"
         val secondRow = view.findViewById<TextView>(R.id.adapter_second_row)
-        secondRow.text = "$min min $sec sec, $distance $unit"
+        secondRow.text = "${Util.formatDuration(duration)}, $distance $unit"
 
         return view
     }

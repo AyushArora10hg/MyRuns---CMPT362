@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import java.util.Calendar
 
 // View Model
 // Code adapted from XD's demo lectures
@@ -13,6 +14,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
         id = 0,
         inputType = 0,
         activityType = 0,
+        dateTime = Calendar.getInstance(),
         duration = 0.0,
         distance = 0.0,
         avgPace = 0.0,

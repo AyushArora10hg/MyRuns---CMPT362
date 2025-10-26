@@ -12,10 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.Util
 import ca.sfu.cmpt362.ayusharora.myruns.database.ViewModelFactory
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
+import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity() {
 
@@ -149,7 +151,21 @@ class ManualInputActivity : AppCompatActivity() {
     private fun handleDialogInputs(){
 
         // Date
+        supportFragmentManager.setFragmentResultListener("selected_date", this){_, bundle ->
+            val year = bundle.getInt("selected_year")
+            val month = bundle.getInt("selected_month")
+            val day = bundle.getInt("selected_day")
+            workoutViewModel.entry.dateTime.set(year, month, day)
+        }
+
         // Time
+        supportFragmentManager.setFragmentResultListener("selected_time", this){_, bundle ->
+            val hour = bundle.getInt("selected_hour")
+            val min = bundle.getInt("selected_minute")
+            workoutViewModel.entry.dateTime.set(Calendar.HOUR_OF_DAY, hour)
+            workoutViewModel.entry.dateTime.set(Calendar.MINUTE, min)
+            workoutViewModel.entry.dateTime.set(Calendar.SECOND, 0)
+        }
         // Duration
         supportFragmentManager.setFragmentResultListener("input_duration", this){_, bundle->
             val value = bundle.getString("user_input")
@@ -203,7 +219,8 @@ class ManualInputActivity : AppCompatActivity() {
             val unitArray = resources.getStringArray(R.array.unit_values)
             val unit = unitSharedPreference.getString("unit_preference", unitArray[0])
             if (unit == unitArray[1]){
-                workoutViewModel.entry.distance = "%.2f".format(workoutViewModel.entry.distance * 1.6094).toDouble()
+                // User has selected imperial system, so convert miles to kms
+                workoutViewModel.entry.distance = Util.convertMilesToKilometers(workoutViewModel.entry.distance)
             }
             workoutViewModel.insert()
             dialogSharedPreferences.edit {

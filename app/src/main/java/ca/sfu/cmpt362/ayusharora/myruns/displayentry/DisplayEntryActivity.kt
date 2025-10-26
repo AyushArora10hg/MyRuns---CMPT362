@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.Util
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.database.ViewModelFactory
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
@@ -69,12 +70,8 @@ class DisplayEntryActivity () : AppCompatActivity() {
                 }
                 else if (unit == unitArray[1]) {
                     unit = "mi"
-                    displayDistance = (entry.distance / 1.6094)
+                    displayDistance = Util.convertKilometersToMiles(displayDistance)
                 }
-                // Time format
-                val duration = entry.duration
-                val min = floor(duration).toInt()
-                val sec = ((duration - min) * 60).toInt()
 
                 // Add Data to all edit texts
                 val inputTypeEditText = findViewById<EditText>(R.id.de_edittext_input)
@@ -82,15 +79,15 @@ class DisplayEntryActivity () : AppCompatActivity() {
                 val activityTypeEditText = findViewById<EditText>(R.id.de_edittext_activity)
                 activityTypeEditText.setText(activityTypeArray[entry.activityType])
                 val dateAndTimeEditText = findViewById<EditText>(R.id.de_edittext_date_time)
-                dateAndTimeEditText.setText("9:12:32 Oct 23 2025")
+                dateAndTimeEditText.setText(Util.formatDateTime(entry.dateTime))
                 val durationEditText = findViewById<EditText>(R.id.de_edittext_duration)
-                durationEditText.setText("$min min $sec sec")
+                durationEditText.setText(Util.formatDuration(entry.duration))
                 val distanceEditText = findViewById<EditText>(R.id.de_edittext_distance)
-                distanceEditText.setText("%.3f".format(displayDistance) + " $unit")
+                distanceEditText.setText("$displayDistance $unit")
                 val caloriesEditText = findViewById<EditText>(R.id.de_edittext_calories)
-                caloriesEditText.setText("%.2f".format(entry.calorie) + " kcal")
+                caloriesEditText.setText("${Util.roundToTwoPlaces(entry.calorie)} kcal")
                 val heartRateEditText = findViewById<EditText>(R.id.de_edittext_heart_rate)
-                heartRateEditText.setText("%.2f".format(entry.heartRate) + " bpm")
+                heartRateEditText.setText("${Util.roundToTwoPlaces(entry.heartRate)} bpm")
                 val commentsEditText = findViewById<EditText>(R.id.de_edittext_comments)
                 commentsEditText.setText(entry.comment)
             }
