@@ -8,8 +8,10 @@ import android.widget.ListView
 import androidx.fragment.app.DialogFragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
 
+// Code adapted from XD's lecture/demo on dialogs.
 class OptionDialogFragment : DialogFragment() {
 
+    // Holding constants for other classes to send in arguments like what dialog to create and with what attributes.
     companion object {
         const val TITLE_KEY = "title"
         const val OPTIONS = "options"
@@ -18,7 +20,6 @@ class OptionDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val builder = AlertDialog.Builder(requireActivity())
-
         val view = requireActivity().layoutInflater.inflate(
             R.layout.fragment_options_dialog,
             null)

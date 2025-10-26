@@ -157,7 +157,6 @@ class ManualInputActivity : AppCompatActivity() {
             val day = bundle.getInt("selected_day")
             workoutViewModel.entry.dateTime.set(year, month, day)
         }
-
         // Time
         supportFragmentManager.setFragmentResultListener("selected_time", this){_, bundle ->
             val hour = bundle.getInt("selected_hour")

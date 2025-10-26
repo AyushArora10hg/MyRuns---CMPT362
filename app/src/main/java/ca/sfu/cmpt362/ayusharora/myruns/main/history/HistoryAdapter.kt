@@ -9,7 +9,6 @@ import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.Util
-import kotlin.math.floor
 
 //Custom adapter inflating two text views to each entry of a ListView
 // Code adapted from XD's lecture demos

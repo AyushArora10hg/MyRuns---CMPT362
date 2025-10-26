@@ -45,6 +45,8 @@ class UserProfileActivity : AppCompatActivity() {
         loadProfile()
         setupButtons()
     }
+
+    // Initialize everything
     private fun setup(){
 
         nameEditText = findViewById(R.id.up_edittext_name)
@@ -94,6 +96,8 @@ class UserProfileActivity : AppCompatActivity() {
             }
         }
     }
+
+    // Load saved date from shared preferences and set them to edit texts
     private fun loadProfile(){
 
         val sharedPreference = getSharedPreferences(profileData, MODE_PRIVATE)
@@ -111,6 +115,8 @@ class UserProfileActivity : AppCompatActivity() {
             genderRadioGroup.check(R.id.up_radiobutton_female)
         }
     }
+
+    // Save data to shared preferences from user inputs to edit texts
     private fun saveProfile(){
 
         val sharedPreference = getSharedPreferences(profileData, MODE_PRIVATE)
@@ -131,7 +137,10 @@ class UserProfileActivity : AppCompatActivity() {
         }
     }
 
-    //The code for this function is derived and extended from lecture 2 demo (CameraDemoKotlin)
+    // Add listeners to save, cancel and change button
+    // Save button: call saveProfile(), finish
+    // Cancel button: finish
+    // Change: show a dialog to choose how to select profile image
     private fun setupButtons(){
 
         val changeButton : Button = findViewById(R.id.up_button_camera)
@@ -170,11 +179,13 @@ class UserProfileActivity : AppCompatActivity() {
             finish()
         }
     }
+
     private fun launchCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
         cameraResult.launch(intent)
     }
+
     private fun launchGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"

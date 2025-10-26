@@ -24,7 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/heading"
         app:tabGravity="fill"
-        app:tabSelectedTextColor="@color/black"
         app:tabIndicatorColor="@color/blue"
         app:tabIndicatorFullWidth="true"/>
 

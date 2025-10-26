@@ -13,7 +13,6 @@ import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.manualinput.ManualInputActivity
 import ca.sfu.cmpt362.ayusharora.myruns.mapdisplay.MapDisplayActivity
 
-
 class StartFragment : Fragment() {
 
     private lateinit var inputTypeSpinner: Spinner
