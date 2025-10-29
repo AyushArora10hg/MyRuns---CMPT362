@@ -44,7 +44,7 @@ object Util {
     }
 
     // Convert date and time from Calendar object to readable string
-    // eg. 09:10:55 October 23 2025
+    // eg. 09:10:55 Oct 23 2025
     fun formatDateTime(calendar: Calendar): String {
         val dateFormat = SimpleDateFormat("HH:mm:ss MMM dd yyyy", Locale.getDefault())
         return dateFormat.format(calendar.time)

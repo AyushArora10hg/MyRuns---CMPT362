@@ -5,6 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 //Code copied from lecture 2 demo (CameraDemoKotlin)
-class MyViewModel : ViewModel() {
+class UserProfileViewModel : ViewModel() {
     val userImage = MutableLiveData<Bitmap?>()
 }

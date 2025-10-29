@@ -22,32 +22,46 @@ import ca.sfu.cmpt362.ayusharora.myruns.manualinput.InputDialogFragment
 import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
+
+    // Constants
     private val profileData = "MyRuns_UserProfile"
     private val finalImgFileName = "profile_img.jpg"
     private val tempImgFileName = "temp_profile_img.jpg"
+
+    // UI elements
     private lateinit var nameEditText: EditText
     private lateinit var emailEditText: EditText
     private lateinit var phoneEditText: EditText
     private lateinit var classEditText: EditText
     private lateinit var majorEditText: EditText
     private lateinit var genderRadioGroup: RadioGroup
+    private lateinit var userProfileImageView: ImageView
+
+    // Files
     private lateinit var finalImgFile: File
     private lateinit var tempImgUri: Uri
     private lateinit var tempImgFile: File
-    private lateinit var myViewModel: MyViewModel
+
+    // Activity launchers
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     private lateinit var galleryResult: ActivityResultLauncher<Intent>
+
+    // View model for live data
+    private lateinit var userProfileViewModel: UserProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
-        setup()
-        loadProfile()
+        setupViews()
+        setupImageFiles()
         setupButtons()
+        setupActivityResults()
+        observerProfileImage()
+
     }
 
-    // Initialize everything
-    private fun setup(){
+    // Initialize UI views and load data to them (EditTexts, RadioGroups etc)
+    private fun setupViews(){
 
         nameEditText = findViewById(R.id.up_edittext_name)
         emailEditText = findViewById(R.id.up_edittext_email)
@@ -55,45 +69,60 @@ class UserProfileActivity : AppCompatActivity() {
         classEditText = findViewById(R.id.up_edittext_class)
         majorEditText = findViewById(R.id.up_edittext_major)
         genderRadioGroup = findViewById(R.id.up_radiogroup_gender)
+        userProfileImageView = findViewById(R.id.up_image_view)
+        loadProfile()
 
-        // Some of the code below is adapted from lecture 2 demo (CameraDemoKotlin)
-        val imageView: ImageView = findViewById(R.id.up_image_view)
+    }
+
+    // Load all image files to store profile picture
+    // Code adapted from XD's lecture demos
+    fun setupImageFiles(){
         finalImgFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), finalImgFileName)
         if (finalImgFile.exists()) {
-            imageView.setImageURI(Uri.fromFile(finalImgFile))
+            userProfileImageView.setImageURI(Uri.fromFile(finalImgFile))
         } else {
-            imageView.setImageResource(R.drawable.default_profile)
+            userProfileImageView.setImageResource(R.drawable.default_profile)
         }
+
         tempImgFile = File(
             getExternalFilesDir(Environment.DIRECTORY_PICTURES),
             tempImgFileName
         )
         tempImgUri = FileProvider.getUriForFile(this,
             "ca.sfu.cmpt362.ayusharora.myruns", tempImgFile)
+    }
 
-        myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
-        myViewModel.userImage.observe(this) { it ->
-            imageView.setImageBitmap(it)
-        }
-
+    // Register for camera and gallery results
+    // Code adapted from XD's lecture demos
+    private fun setupActivityResults(){
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _->
             if (tempImgFile.exists()) {
                 val bitmap = Util.getBitmap(this, tempImgUri)
-                myViewModel.userImage.value = bitmap
+                userProfileViewModel.userImage.value = bitmap
             }
         }
 
+        // Some code taken from chatGPT regarding how to register for a gallery result
         galleryResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val uri = result.data!!.data!!
                 val bitmap = Util.getBitmap(this, uri)
-                myViewModel.userImage.value = bitmap
+                userProfileViewModel.userImage.value = bitmap
                 val input = contentResolver.openInputStream(uri)
                 val output = tempImgFile.outputStream()
                 input?.copyTo(output)
                 input?.close()
                 output.close()
             }
+        }
+    }
+
+    // View model to observe image changes
+    // Code adpated from XD's lecture demos
+    private fun observerProfileImage(){
+        userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
+        userProfileViewModel.userImage.observe(this) { it ->
+            userProfileImageView.setImageBitmap(it)
         }
     }
 
@@ -135,6 +164,11 @@ class UserProfileActivity : AppCompatActivity() {
                 }
             )
         }
+
+        if (tempImgFile.exists()) {
+            tempImgFile.copyTo(finalImgFile, overwrite = true)
+            tempImgFile.delete()
+        }
     }
 
     // Add listeners to save, cancel and change button
@@ -145,30 +179,12 @@ class UserProfileActivity : AppCompatActivity() {
 
         val changeButton : Button = findViewById(R.id.up_button_camera)
         changeButton.setOnClickListener{
-
-            val dialog =OptionDialogFragment()
-            val args = Bundle()
-            args.putString(InputDialogFragment.Companion.TITLE_KEY, "Select Profile Image")
-            args.putStringArray(OptionDialogFragment.Companion.OPTIONS, resources.getStringArray(R.array.user_profile_options))
-            dialog.arguments = args
-            dialog.show(supportFragmentManager, "UserProfileDialog")
-
-            supportFragmentManager.setFragmentResultListener("selectedChoice", this) { requestKey, bundle ->
-                when (bundle.getInt("choice")) {
-                    0 -> launchCamera()
-                    1 -> launchGallery()
-                }
-            }
+            showImageSelectionDialog()
         }
 
         val saveButton : Button = findViewById(R.id.up_button_save)
         saveButton.setOnClickListener {
             saveProfile()
-
-            if (tempImgFile.exists()) {
-                tempImgFile.copyTo(finalImgFile, overwrite = true)
-                tempImgFile.delete()
-            }
             Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -180,12 +196,31 @@ class UserProfileActivity : AppCompatActivity() {
         }
     }
 
+    // Create a dialog with two options (Open Camera, Select from Gallery)
+    private fun showImageSelectionDialog() {
+        val dialog = OptionDialogFragment()
+        val args = Bundle()
+        args.putString(InputDialogFragment.Companion.TITLE_KEY, "Select Profile Image")
+        args.putStringArray(OptionDialogFragment.Companion.OPTIONS, resources.getStringArray(R.array.user_profile_options))
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, "UserProfileDialog")
+
+        supportFragmentManager.setFragmentResultListener("selectedChoice", this) { requestKey, bundle ->
+            when (bundle.getInt("choice")) {
+                0 -> launchCamera()
+                1 -> launchGallery()
+            }
+        }
+    }
+
+    // Open camera
     private fun launchCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
         cameraResult.launch(intent)
     }
 
+    // Open gallery
     private fun launchGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
