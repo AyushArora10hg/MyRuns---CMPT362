@@ -53,13 +53,13 @@ object Util {
     // miles -> kilometers
     fun convertMilesToKilometers (distanceInMiles: Double ) :Double {
 
-        return "%.3f".format(distanceInMiles * 1.6094).toDouble()
+        return "%.3f".format(distanceInMiles * 1.60934).toDouble()
     }
 
     // kilometers -> miles
     fun convertKilometersToMiles (distanceInKilometers: Double ) :Double {
 
-        return "%.3f".format(distanceInKilometers / 1.6094).toDouble()
+        return "%.3f".format(distanceInKilometers / 1.60934).toDouble()
     }
 
     // convert duration from double to readable form

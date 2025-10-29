@@ -26,7 +26,7 @@
     <string name="spinner_input_type">Input Type</string>
     <string name="spinner_activity_type">Activity Type</string>
 
-    <string name="link_webpage">https://www.sfu.ca/computing.html</string>
+    <string name="link_webpage">https://www.sfu.ca/fas/computing.html</string>
     <string name="de_textview_input">Input Type</string>
     <string name="de_textview_activity">Activity Type</string>
     <string name="de_textview_date_time">Date and Time</string>

@@ -13,7 +13,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.Util
-import ca.sfu.cmpt362.ayusharora.myruns.database.ViewModelFactory
+import ca.sfu.cmpt362.ayusharora.myruns.ViewModelFactory
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel

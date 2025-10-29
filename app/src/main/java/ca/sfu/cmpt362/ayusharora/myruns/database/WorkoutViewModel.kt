@@ -2,7 +2,6 @@ package ca.sfu.cmpt362.ayusharora.myruns.database
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import java.util.Calendar
 
@@ -33,13 +32,5 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
     fun deleteEntry(id: Long){
         repository.delete(id)
-    }
-}
-
-class ViewModelFactory(private val repository: WorkoutRepository) : ViewModelProvider.Factory{
-    override fun<T: ViewModel> create (modelClass: Class<T>) : T{
-        if(modelClass.isAssignableFrom(WorkoutViewModel::class.java))
-            return WorkoutViewModel(repository) as T
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
