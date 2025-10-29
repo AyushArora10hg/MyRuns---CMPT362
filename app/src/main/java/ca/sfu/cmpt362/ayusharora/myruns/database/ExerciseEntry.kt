@@ -16,36 +16,36 @@ data class ExerciseEntry (
     var id: Long = 0L,                          // Unique ID to each entry
 
     @ColumnInfo(name = "input_type")
-    var inputType: Int,                         // Manual, GPS or automatic
+    var inputType: Int = 0,                         // Manual, GPS or automatic
 
     @ColumnInfo(name = "activity_type")
-    var activityType: Int,                      // Running, cycling etc.
+    var activityType: Int = 0,                      // Running, cycling etc.
 
     @ColumnInfo(name = "date_time")
-    var dateTime: Calendar,                     // Date and Time ("9:45:12 Oct 18 2025")
+    var dateTime: Calendar = Calendar.getInstance(),      // Date and Time ("9:45:12 Oct 18 2025")
 
     @ColumnInfo(name = "duration")
-    var duration: Double,                       // Exercise duration in seconds
+    var duration: Double = 0.0,                       // Exercise duration in seconds
 
     @ColumnInfo(name = "distance")
-    var distance: Double,                       // Distance traveled in kms or miles
+    var distance: Double = 0.0,                       // Distance traveled in kms or miles
 
     @ColumnInfo(name = "average_pace")
-    var avgPace: Double,                        // Average pace
+    var avgPace: Double = 0.0,                        // Average pace
 
     @ColumnInfo(name = "average_speed")
-    var avgSpeed: Double,                       // Average speed
+    var avgSpeed: Double = 0.0,                       // Average speed
 
     @ColumnInfo(name = "calories")
-    var calorie: Double,                        // Calories burnt
+    var calorie: Double = 0.0,                        // Calories burnt
 
     @ColumnInfo(name = "climb")
-    var climb: Double,                          // Climb. Either in meters or feet.
+    var climb: Double = 0.0,                          // Climb. Either in meters or feet.
 
     @ColumnInfo(name = "heart_rate")
-    var heartRate: Double,                      // Heart rate in bpm
+    var heartRate: Double = 0.0,                      // Heart rate in bpm
 
     @ColumnInfo(name = "comment")
-    var comment: String                         // Comments
+    var comment: String = ""                         // Comments
 
 )

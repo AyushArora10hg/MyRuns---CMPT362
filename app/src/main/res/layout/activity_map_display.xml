@@ -10,15 +10,9 @@
         android:id="@+id/heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:background="@color/off_white"
         android:text="@string/heading_map_display"
-        android:textSize="25sp"
-        android:textStyle="bold"
-        android:elevation="6dp"
-        android:translationZ="6dp"
         android:layout_alignParentTop="true"
-        />
+        style="@style/Widget.MyRuns.Heading"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,8 +29,6 @@
             android:layout_weight="1"
             android:text="@string/button_positive"
             app:cornerRadius="0dp"
-            android:backgroundTint="@color/gray"
-            android:textColor="@color/black"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="3dp"/>
 
@@ -47,8 +39,6 @@
             android:layout_weight="1"
             android:text="@string/button_negative"
             app:cornerRadius="0dp"
-            android:backgroundTint="@color/gray"
-            android:textColor="@color/black"
             android:layout_marginStart="3dp"
             android:layout_marginEnd="10dp"/>
 
