@@ -63,10 +63,9 @@ class DisplayEntryActivity () : AppCompatActivity() {
 
                 // Units for distance
                 var unit = sharedPreferences.getString("unit_preference", unitArray[0])
-                var displayDistance = 0.0
+                var displayDistance = entry.distance
                 if (unit == unitArray[0]) {
                     unit = "km"
-                    displayDistance = entry.distance
                 }
                 else if (unit == unitArray[1]) {
                     unit = "mi"
