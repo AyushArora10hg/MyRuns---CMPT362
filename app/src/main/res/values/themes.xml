@@ -1,3 +1,5 @@
+<!-- Most of the code is AI generated as themes are not a major requirement of the assignments-->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Ayush_Arora_MyRuns" parent="Theme.Material3.DayNight.NoActionBar">
