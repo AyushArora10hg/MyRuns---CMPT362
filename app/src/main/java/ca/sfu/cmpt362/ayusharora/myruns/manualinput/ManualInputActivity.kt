@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.Util
 import ca.sfu.cmpt362.ayusharora.myruns.ViewModelFactory
-import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
@@ -26,7 +25,6 @@ class ManualInputActivity : AppCompatActivity() {
     private lateinit var workoutViewModel: WorkoutViewModel
     private lateinit var unitSharedPreference: SharedPreferences
     private lateinit var dialogSharedPreferences: SharedPreferences
-    private lateinit var entry: ExerciseEntry
     private var shouldShowToast = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,7 +128,6 @@ class ManualInputActivity : AppCompatActivity() {
 
         unitSharedPreference = PreferenceManager.getDefaultSharedPreferences(this)
         dialogSharedPreferences = getSharedPreferences("dialogData", MODE_PRIVATE)
-        entry = ExerciseEntry()
 
         val db = WorkoutDatabase.getInstance(this)
         val dao = db.workoutDatabaseDao
@@ -157,20 +154,20 @@ class ManualInputActivity : AppCompatActivity() {
             val year = bundle.getInt("selected_year")
             val month = bundle.getInt("selected_month")
             val day = bundle.getInt("selected_day")
-            entry.dateTime.set(year, month, day)
+            workoutViewModel.entry.dateTime.set(year, month, day)
         }
         // Time
         supportFragmentManager.setFragmentResultListener("selected_time", this){_, bundle ->
             val hour = bundle.getInt("selected_hour")
             val min = bundle.getInt("selected_minute")
-            entry.dateTime.set(Calendar.HOUR_OF_DAY, hour)
-            entry.dateTime.set(Calendar.MINUTE, min)
-            entry.dateTime.set(Calendar.SECOND, 0)
+            workoutViewModel.entry.dateTime.set(Calendar.HOUR_OF_DAY, hour)
+            workoutViewModel.entry.dateTime.set(Calendar.MINUTE, min)
+            workoutViewModel.entry.dateTime.set(Calendar.SECOND, 0)
         }
         // Duration
         supportFragmentManager.setFragmentResultListener("input_duration", this){_, bundle->
             val value = bundle.getString("user_input")
-            entry.duration = value?.toDoubleOrNull()?:0.0
+            workoutViewModel.entry.duration = value?.toDoubleOrNull()?:0.0
             dialogSharedPreferences.edit{
                 putString("duration", value)
             }
@@ -178,7 +175,7 @@ class ManualInputActivity : AppCompatActivity() {
         // Distance
         supportFragmentManager.setFragmentResultListener("input_distance", this){_, bundle->
             val value = bundle.getString("user_input")
-            entry.distance = value?.toDoubleOrNull()?:0.0
+            workoutViewModel.entry.distance = value?.toDoubleOrNull()?:0.0
             dialogSharedPreferences.edit{
                 putString("distance", value)
             }
@@ -186,7 +183,7 @@ class ManualInputActivity : AppCompatActivity() {
         // Calories
         supportFragmentManager.setFragmentResultListener("input_calories", this){_, bundle->
             val value = bundle.getString("user_input")
-            entry.calorie = value?.toDoubleOrNull()?:0.0
+            workoutViewModel.entry.calorie = value?.toDoubleOrNull()?:0.0
             dialogSharedPreferences.edit{
                 putString("calories", value)
             }
@@ -194,7 +191,7 @@ class ManualInputActivity : AppCompatActivity() {
         // Heart Rate
         supportFragmentManager.setFragmentResultListener("input_heart rate", this){_, bundle->
             val value = bundle.getString("user_input")
-            entry.heartRate = value?.toDoubleOrNull()?:0.0
+            workoutViewModel.entry.heartRate = value?.toDoubleOrNull()?:0.0
             dialogSharedPreferences.edit{
                 putString("heartRate", value)
             }
@@ -202,7 +199,7 @@ class ManualInputActivity : AppCompatActivity() {
         // Comments
         supportFragmentManager.setFragmentResultListener("input_comments", this){_, bundle->
             val value = bundle.getString("user_input")
-            entry.comment = value?: ""
+            workoutViewModel.entry.comment = value?: ""
             dialogSharedPreferences.edit{
                 putString("comments", value)
             }
@@ -216,14 +213,14 @@ class ManualInputActivity : AppCompatActivity() {
 
         val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
-            entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+            workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
             val unitArray = resources.getStringArray(R.array.unit_values)
             val unit = unitSharedPreference.getString("unit_preference", unitArray[0])
             if (unit == unitArray[1]){
                 // User has selected imperial system, so convert miles to kms
-                entry.distance = Util.convertMilesToKilometers(entry.distance)
+                workoutViewModel.entry.distance = Util.convertMilesToKilometers(workoutViewModel.entry.distance)
             }
-            workoutViewModel.insert(entry)
+            workoutViewModel.insert()
             dialogSharedPreferences.edit {
                 clear()
                 apply()

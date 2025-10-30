@@ -9,9 +9,11 @@ import java.util.Calendar
 // Code adapted from XD's demo lectures
 class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
+    val entry: ExerciseEntry = ExerciseEntry()
+
     val allWorkouts : LiveData<List<ExerciseEntry>> = repository.allWorkouts.asLiveData()
 
-    fun insert(entry: ExerciseEntry){
+    fun insert(){
         repository.insert(entry)
     }
 
