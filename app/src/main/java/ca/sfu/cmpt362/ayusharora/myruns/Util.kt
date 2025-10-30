@@ -21,16 +21,35 @@ object Util {
 
     // Ask for user permission
     // Code copied from XD's lecture demos
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun checkPermissions(activity: Activity?) {
+        activity ?: return
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(activity, arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_EXTERNAL_STORAGE),
-                0)
+        val permissions = mutableListOf<String>()
+
+        // Camera permission (available on all versions)
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA)
+        }
+
+        // Storage permissions - different for different Android versions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ uses READ_MEDIA_IMAGES
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_MEDIA_IMAGES)
+                != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+        } else {
+            // Android 12 and below use READ_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+
+        // Request all needed permissions at once
+        if (permissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(activity, permissions.toTypedArray(), 0)
         }
     }
 
