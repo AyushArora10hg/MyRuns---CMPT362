@@ -5,11 +5,10 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.Util
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.ViewModelFactory
+import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabaseDao
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
@@ -50,44 +49,31 @@ class DisplayEntryActivity () : AppCompatActivity() {
     // It grabs all the attributes of that activity from database and displays them
     private fun setupActivityDisplay(){
 
-        val inputTypeArray = resources.getStringArray(R.array.input_type)
-        val activityTypeArray = resources.getStringArray(R.array.activity_type)
-        val unitArray = resources.getStringArray(R.array.unit_values)
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val pos = intent.getIntExtra("position", -1)
 
         workoutViewModel.allWorkouts.observe(this) { workouts ->
             if (pos == -1 || pos < workouts.size) {
                 entry = workouts[pos]
 
-                // Units for distance
-                var unit = sharedPreferences.getString("unit_preference", unitArray[0])
-                var displayDistance = entry.distance
-                if (unit == unitArray[0]) {
-                    unit = "km"
-                }
-                else if (unit == unitArray[1]) {
-                    unit = "mi"
-                    displayDistance = Util.convertKilometersToMiles(displayDistance)
-                }
+                WorkoutFormatter.initialize(this, entry)
 
                 // Add Data to all edit texts
                 val inputTypeEditText = findViewById<EditText>(R.id.de_edittext_input)
-                inputTypeEditText.setText(inputTypeArray[entry.inputType])
+                inputTypeEditText.setText(WorkoutFormatter.inputType)
                 val activityTypeEditText = findViewById<EditText>(R.id.de_edittext_activity)
-                activityTypeEditText.setText(activityTypeArray[entry.activityType])
+                activityTypeEditText.setText(WorkoutFormatter.activityType)
                 val dateAndTimeEditText = findViewById<EditText>(R.id.de_edittext_date_time)
-                dateAndTimeEditText.setText(Util.formatDateTime(entry.dateTime))
+                dateAndTimeEditText.setText(WorkoutFormatter.dateTime)
                 val durationEditText = findViewById<EditText>(R.id.de_edittext_duration)
-                durationEditText.setText(Util.formatDuration(entry.duration))
+                durationEditText.setText(WorkoutFormatter.duration)
                 val distanceEditText = findViewById<EditText>(R.id.de_edittext_distance)
-                distanceEditText.setText("$displayDistance $unit")
+                distanceEditText.setText(WorkoutFormatter.distance)
                 val caloriesEditText = findViewById<EditText>(R.id.de_edittext_calories)
-                caloriesEditText.setText("${Util.roundToTwoPlaces(entry.calorie)} kcal")
+                caloriesEditText.setText(WorkoutFormatter.calories)
                 val heartRateEditText = findViewById<EditText>(R.id.de_edittext_heart_rate)
-                heartRateEditText.setText("${Util.roundToTwoPlaces(entry.heartRate)} bpm")
+                heartRateEditText.setText(WorkoutFormatter.heartRate)
                 val commentsEditText = findViewById<EditText>(R.id.de_edittext_comments)
-                commentsEditText.setText(entry.comment)
+                commentsEditText.setText(WorkoutFormatter.comment)
             }
         }
     }
@@ -97,6 +83,7 @@ class DisplayEntryActivity () : AppCompatActivity() {
         val deleteButton : Button = findViewById(R.id.de_button_delete)
         deleteButton.setOnClickListener {
             workoutViewModel.deleteEntry(entry.id)
+            workoutViewModel.allWorkouts.removeObservers(this)
             finish()
         }
     }

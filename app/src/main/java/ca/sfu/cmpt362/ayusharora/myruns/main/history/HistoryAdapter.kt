@@ -5,10 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.Util
+import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
 
 //Custom adapter inflating two text views to each entry of a ListView
 // Code adapted from XD's lecture demos
@@ -32,37 +31,13 @@ class HistoryAdapter (private val context: Context, private var workoutList: Lis
         val view = View.inflate(context, R.layout.adapter_fragment_history, null)
         val currentEntry = workoutList[position]
 
-        // inputType
-        val inputTypeArray = context.resources.getStringArray(R.array.input_type)
-        val inputType = inputTypeArray[currentEntry.inputType]
-
-        // activityType
-        val activityTypeArray = context.resources.getStringArray(R.array.activity_type)
-        val activityType = activityTypeArray[currentEntry.activityType]
-
-        //dateTime
-        val dateTime = currentEntry.dateTime
-
-        //duration
-        val duration = currentEntry.duration
-
-        //distance
-        var distance = currentEntry.distance
-        val unitArray = context.resources.getStringArray(R.array.unit_values)
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        var unit = sharedPreferences.getString("unit_preference", unitArray[0])
-        if (unit == unitArray[0]){
-            unit = "km"
-        } else if (unit == unitArray[1]){
-            unit = "mi"
-            distance = Util.convertKilometersToMiles(distance)
-        }
+        WorkoutFormatter.initialize(context, currentEntry)
 
         // TextViews
         val firstRow = view.findViewById<TextView>(R.id.adapter_first_row)
-        firstRow.text = "$inputType: $activityType, ${Util.formatDateTime(dateTime)}"
+        firstRow.text = "${WorkoutFormatter.inputType}: ${WorkoutFormatter.activityType}, ${WorkoutFormatter.dateTime}"
         val secondRow = view.findViewById<TextView>(R.id.adapter_second_row)
-        secondRow.text = "${Util.formatDuration(duration)}, $distance $unit"
+        secondRow.text = "${WorkoutFormatter.duration}, ${WorkoutFormatter.distance}"
 
         return view
     }

@@ -25,16 +25,11 @@ class HistoryFragment : Fragment() {
     // adapter to load elements
     private lateinit var arrayAdapter: HistoryAdapter
 
-    // preference for unit info
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var preferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
-
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(R.layout.fragment_history, container, false)
 
         setupListView(view)
         observeDatabase()
-        observeUnitPreference()
 
         return view
     }
@@ -71,22 +66,8 @@ class HistoryFragment : Fragment() {
         })
     }
 
-    // This helper method observes what unit system user has selected in the settings fragment
-    // It updates the listView in real time too (triggers notifyDataSetChanged, which in turn
-    // converts all values and units according to the selected system)
-    private fun observeUnitPreference(){
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity())
-        preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            if (key == "unit_preference") {
-                arrayAdapter.notifyDataSetChanged()
-            }
-        }
-        sharedPreferences.registerOnSharedPreferenceChangeListener (preferenceChangeListener)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
+    override fun onResume() {
+        super.onResume()
+        arrayAdapter.notifyDataSetChanged()
     }
 }

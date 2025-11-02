@@ -62,37 +62,9 @@ object Util {
         return ret
     }
 
-    // Convert date and time from Calendar object to readable string
-    // eg. 09:10:55 Oct 23 2025
-    fun formatDateTime(calendar: Calendar): String {
-        val dateFormat = SimpleDateFormat("HH:mm:ss MMM dd yyyy", Locale.getDefault())
-        return dateFormat.format(calendar.time)
-    }
-
     // miles -> kilometers
     fun convertMilesToKilometers (distanceInMiles: Double ) :Double {
 
         return "%.3f".format(distanceInMiles * 1.60934).toDouble()
-    }
-
-    // kilometers -> miles
-    fun convertKilometersToMiles (distanceInKilometers: Double ) :Double {
-
-        return "%.3f".format(distanceInKilometers / 1.60934).toDouble()
-    }
-
-    // convert duration from double to readable form
-    // 30.5 -> 30 min 30 sec
-    fun formatDuration(duration: Double) : String {
-
-        val min = floor(duration).toInt()
-        val sec = ((duration - min) * 60).toInt()
-
-        return "$min min $sec sec"
-    }
-
-    fun roundToTwoPlaces(value: Double): String{
-
-        return  "%.2f".format(value)
     }
 }

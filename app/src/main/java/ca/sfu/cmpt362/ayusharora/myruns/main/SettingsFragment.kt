@@ -7,6 +7,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
 import ca.sfu.cmpt362.ayusharora.myruns.userprofile.UserProfileActivity
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -28,6 +29,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val url = getString(R.string.link_webpage)
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(intent)
+            true
+        }
+
+        val unitPreference = findPreference<Preference>("unit_preference")
+        unitPreference?.setOnPreferenceChangeListener{ _,newValue ->
+            val unitArray = resources.getStringArray(R.array.unit_values)
+            if (newValue == unitArray[1]){
+                WorkoutFormatter.convertToImperial()
+            } else {
+                WorkoutFormatter.convertToMetric()
+            }
             true
         }
     }
