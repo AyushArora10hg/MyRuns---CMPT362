@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_main)
         Util.checkPermissions(this)
-
         setupFragments()
         handleTabLayout()
     }
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         val viewPager2: ViewPager2 = findViewById(R.id.main_viewpager)
         val myFragmentStateAdapter = MyFragmentStateAdapter(this, fragments)
         viewPager2.adapter = myFragmentStateAdapter
-        viewPager2.offscreenPageLimit = 1
+        viewPager2.offscreenPageLimit = 2
 
         val tabConfigurationStrategy: TabLayoutMediator.TabConfigurationStrategy =
             TabLayoutMediator.TabConfigurationStrategy { tab: TabLayout.Tab, position: Int ->

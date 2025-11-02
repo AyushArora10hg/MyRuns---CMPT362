@@ -23,6 +23,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
         const val INPUT_TYPE_KEY = "inputType"
         const val HINT_KEY = "editTextHint"
         const val DEFAULT_TEXT_KEY = "defaultText"
+        const val CALENDAR = "calendar"
         const val TYPE_DATE = 0
         const val TYPE_TIME = 1
         const val TYPE_INPUT = 2
@@ -79,6 +80,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     // returns a datePicker Dialog
     private fun createDatePickerDialog() : Dialog{
         val calendar = Calendar.getInstance()
+        calendar.timeInMillis = arguments?.getLong(CALENDAR)!!
         val dialog = DatePickerDialog(
             requireContext(),
             this,
@@ -92,6 +94,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     // returns a timePickerDialog
     private fun createTimePickerDialog() : Dialog{
         val calendar = Calendar.getInstance()
+        calendar.timeInMillis = arguments?.getLong(CALENDAR)!!
         val dialog = TimePickerDialog(
             requireContext(),
             this,
@@ -122,7 +125,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
         if (hint != null) {
             editText.setHint(hint)
         }
-        if (text!= null) {
+        if (text!= null && text != "0.0") {
             editText.setText(text)
         }
         val builder = AlertDialog.Builder(requireActivity())

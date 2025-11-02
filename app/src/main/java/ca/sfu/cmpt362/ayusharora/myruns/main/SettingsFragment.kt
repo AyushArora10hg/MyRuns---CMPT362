@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.preference.Preference
+import androidx.core.net.toUri
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import ca.sfu.cmpt362.ayusharora.myruns.R
@@ -32,9 +34,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val unitPreference = findPreference<Preference>("unit_preference")
+        val unitPreference = findPreference<ListPreference>("unit_preference")
+        val unitArray = resources.getStringArray(R.array.unit_values)
+        if(unitPreference?.value == unitArray[1]){
+            WorkoutFormatter.convertToImperial()
+        } else {
+            WorkoutFormatter.convertToMetric()
+        }
         unitPreference?.setOnPreferenceChangeListener{ _,newValue ->
-            val unitArray = resources.getStringArray(R.array.unit_values)
             if (newValue == unitArray[1]){
                 WorkoutFormatter.convertToImperial()
             } else {

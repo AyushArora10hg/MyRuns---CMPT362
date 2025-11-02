@@ -53,7 +53,7 @@ object WorkoutFormatter {
         }
 
     // Returns unit string based on shouldConvert flag
-    private val distanceUnit: String
+    val distanceUnit: String
         get() = if (shouldConvert) "mi" else "km"
 
 
