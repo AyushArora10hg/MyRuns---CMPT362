@@ -159,7 +159,7 @@ class ManualInputActivity : AppCompatActivity() {
         // Distance
         supportFragmentManager.setFragmentResultListener("input_distance", this){_, bundle->
             val value = bundle.getString("user_input")
-            workoutViewModel.entry.distance = WorkoutFormatter.convertDistanceForStorage(value?.toDoubleOrNull()?:0.0)
+            workoutViewModel.entry.distance = value?.toDoubleOrNull()?:0.0
         }
         // Calories
         supportFragmentManager.setFragmentResultListener("input_calories", this){_, bundle->
@@ -185,6 +185,7 @@ class ManualInputActivity : AppCompatActivity() {
 
         val saveButton = findViewById<Button>(R.id.mi_button_save)
         saveButton.setOnClickListener {
+            workoutViewModel.entry.distance = WorkoutFormatter.convertDistanceForStorage(workoutViewModel.entry.distance)
             workoutViewModel.insert()
             shouldShowToast = true
             finish()

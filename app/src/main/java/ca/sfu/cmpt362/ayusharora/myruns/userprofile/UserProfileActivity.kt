@@ -17,7 +17,6 @@ import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.Util
 import ca.sfu.cmpt362.ayusharora.myruns.manualinput.InputDialogFragment
 import java.io.File
 
@@ -52,16 +51,16 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
-        setupViews()
-        setupImageFiles()
-        setupButtons()
-        setupActivityResults()
-        observerProfileImage()
 
+        setupUI()
+        setupImageFiles()
+        registerActivityResults()
+        handleButtons()
+        observerProfileImage()
     }
 
     // Initialize UI views and load data to them (EditTexts, RadioGroups etc)
-    private fun setupViews(){
+    private fun setupUI(){
 
         nameEditText = findViewById(R.id.up_edittext_name)
         emailEditText = findViewById(R.id.up_edittext_email)
@@ -94,25 +93,26 @@ class UserProfileActivity : AppCompatActivity() {
 
     // Register for camera and gallery results
     // Code adapted from XD's lecture demos
-    private fun setupActivityResults(){
+    private fun registerActivityResults(){
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _->
             if (tempImgFile.exists()) {
-                val bitmap = Util.getBitmap(this, tempImgUri)
-                userProfileViewModel.userImage.value = bitmap
+                userProfileViewModel.userImageUri.value = tempImgUri
             }
         }
 
         // Some code taken from chatGPT regarding how to register for a gallery result
         galleryResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val uri = result.data!!.data!!
-                val bitmap = Util.getBitmap(this, uri)
-                userProfileViewModel.userImage.value = bitmap
-                val input = contentResolver.openInputStream(uri)
-                val output = tempImgFile.outputStream()
-                input?.copyTo(output)
-                input?.close()
-                output.close()
+                val uri = result.data?.data
+                uri?.let {
+                    val input = contentResolver.openInputStream(it)
+                    val output = tempImgFile.outputStream()
+                    input?.copyTo(output)
+                    input?.close()
+                    output.close()
+
+                    userProfileViewModel.userImageUri.value = tempImgUri
+                }
             }
         }
     }
@@ -121,8 +121,8 @@ class UserProfileActivity : AppCompatActivity() {
     // Code adpated from XD's lecture demos
     private fun observerProfileImage(){
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
-        userProfileViewModel.userImage.observe(this) { it ->
-            userProfileImageView.setImageBitmap(it)
+        userProfileViewModel.userImageUri.observe(this) { it ->
+            userProfileImageView.setImageURI(it)
         }
     }
 
@@ -157,7 +157,7 @@ class UserProfileActivity : AppCompatActivity() {
             putString("major", majorEditText.text.toString())
 
             putString(
-                "gender", when (genderRadioGroup.checkedRadioButtonId) {
+                "gender",   when (genderRadioGroup.checkedRadioButtonId) {
                     R.id.up_radiobutton_male -> getString(R.string.radiobutton_male)
                     R.id.up_radiobutton_female -> getString(R.string.radiobutton_female)
                     else -> ""
@@ -175,7 +175,7 @@ class UserProfileActivity : AppCompatActivity() {
     // Save button: call saveProfile(), finish
     // Cancel button: finish
     // Change: show a dialog to choose how to select profile image
-    private fun setupButtons(){
+    private fun handleButtons(){
 
         val changeButton : Button = findViewById(R.id.up_button_camera)
         changeButton.setOnClickListener{

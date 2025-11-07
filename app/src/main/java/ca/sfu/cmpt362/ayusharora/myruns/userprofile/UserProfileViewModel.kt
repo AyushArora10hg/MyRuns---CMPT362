@@ -1,10 +1,10 @@
 package ca.sfu.cmpt362.ayusharora.myruns.userprofile
 
-import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-//Code copied from lecture 2 demo (CameraDemoKotlin)
+//Code adapted from lecture 2 demo (CameraDemoKotlin)
 class UserProfileViewModel : ViewModel() {
-    val userImage = MutableLiveData<Bitmap?>()
+    val userImageUri = MutableLiveData<Uri?>()
 }
