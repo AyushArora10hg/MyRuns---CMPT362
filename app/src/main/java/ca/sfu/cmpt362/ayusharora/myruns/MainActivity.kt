@@ -66,6 +66,8 @@ class MainActivity : AppCompatActivity() {
         activity ?: return
 
         val permissions = mutableListOf<String>()
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
 
         // Camera permission (available on all versions)
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
