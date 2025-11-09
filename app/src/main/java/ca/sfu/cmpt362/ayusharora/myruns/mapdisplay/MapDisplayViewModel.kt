@@ -6,7 +6,6 @@ import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import com.google.android.gms.maps.model.LatLng
 
 class MapDisplayViewModel : ViewModel(), ServiceConnection {
@@ -33,8 +32,6 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
     val calories: LiveData<Double>
         get() = _calories
 
-    val entry: ExerciseEntry = ExerciseEntry()
-
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
 
         val binder = iBinder as TrackingService.MyBinder
@@ -42,12 +39,10 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
         binder.setLocationUpdateListener { location ->
             _currentLocation.postValue(location)
-            entry.locationList.add(location)
         }
 
         binder.setDistanceUpdateListener { dist ->
             _distance.postValue(dist)
-            entry.distance = dist
         }
 
         binder.setCurrentSpeedListener { curSpeed ->
@@ -56,12 +51,10 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
         binder.setAverageSpeedListener { avgSpeed ->
             _avgSpeed.postValue(avgSpeed)
-            entry.avgSpeed = avgSpeed
         }
 
         binder.setCalorieListener { cal ->
             _calories.postValue(cal)
-            entry.calorie = cal
         }
     }
 

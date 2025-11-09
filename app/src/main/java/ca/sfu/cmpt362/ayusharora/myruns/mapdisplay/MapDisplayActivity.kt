@@ -31,6 +31,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         const val TAG = "MapDisplayActivity"
     }
 
+    private var startTimeMillis = 0L
+
     private lateinit var typeTextView: TextView
 
     private lateinit var distanceTextView: TextView
@@ -65,6 +67,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
+        if (startTimeMillis == 0L){
+            startTimeMillis = System.currentTimeMillis()
+        }
+
         typeTextView = findViewById(R.id.md_stats_type)
         distanceTextView = findViewById(R.id.md_stats_distance)
         curSpeedTextView = findViewById(R.id.md_stats_current_speed)
@@ -72,6 +78,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         calorieTextView = findViewById(R.id.md_stats_calories)
         climbTextView = findViewById(R.id.md_stats_climb)
 
+        loadAndObserveDatabase()
         observeLocationChanges()
         showGoogleMap()
         handleButtonClicks()
@@ -92,32 +99,34 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
-        mapDisplayViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
-        mapDisplayViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
 
-        WorkoutFormatter.initialize(this, mapDisplayViewModel.entry)
+        WorkoutFormatter.initialize(this, workoutViewModel.entry)
 
         typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
         climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
 
         mapDisplayViewModel.currentLocation.observe(this) { location ->
             updateMapWithCurrentLocation(location)
+            workoutViewModel.entry.locationList.add(location)
         }
 
-        mapDisplayViewModel.distance.observe(this){_->
+        mapDisplayViewModel.distance.observe(this){d->
             distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+            workoutViewModel.entry.distance = d
         }
 
         mapDisplayViewModel.curSpeed.observe(this){speed ->
             curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.convertSpeedForDisplay(speed)}"
         }
 
-        mapDisplayViewModel.avgSpeed.observe(this){_->
+        mapDisplayViewModel.avgSpeed.observe(this){s->
             avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+            workoutViewModel.entry.avgSpeed = s
         }
 
-        mapDisplayViewModel.calories.observe(this){_ ->
+        mapDisplayViewModel.calories.observe(this){cal ->
             calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+            workoutViewModel.entry.calorie = cal
         }
     }
 
@@ -137,7 +146,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun updateMapWithCurrentLocation(location: LatLng) {
 
-        if(mapDisplayViewModel.entry.locationList.size == 1){
+        if(workoutViewModel.entry.locationList.size == 1){
             startMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(location)
@@ -168,7 +177,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun handleButtonClicks() {
         val saveButton = findViewById<Button>(R.id.md_button_save)
         saveButton.setOnClickListener {
-            Log.d(TAG, "Save button clicked")
+            val duration = (System.currentTimeMillis() - startTimeMillis)/60000.0
+            workoutViewModel.entry.duration = duration
+            workoutViewModel.insert()
+            shouldShowToast = true
             stopTrackingAndFinish()
         }
 
@@ -205,7 +217,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         polyline = mMap.addPolyline(
             PolylineOptions()
-                .addAll(mapDisplayViewModel.entry.locationList)
+                .addAll(workoutViewModel.entry.locationList)
                 .color(android.graphics.Color.BLACK)
                 .width(10f)
         )
