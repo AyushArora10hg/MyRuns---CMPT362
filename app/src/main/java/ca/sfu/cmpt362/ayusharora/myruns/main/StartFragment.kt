@@ -59,7 +59,8 @@ class StartFragment : Fragment() {
 
         val startButton = view.findViewById<Button>(R.id.start_button_start)
         startButton.setOnClickListener {
-            when(inputTypeSpinner.selectedItemPosition){
+            val pos = inputTypeSpinner.selectedItemPosition
+            when(pos){
                 0->{
                     val intent = Intent(requireContext(), ManualInputActivity::class.java)
                     intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
@@ -68,6 +69,7 @@ class StartFragment : Fragment() {
                 }
                 1, 2->{
                     val intent = Intent(requireContext(), MapDisplayActivity::class.java)
+                    intent.putExtra("INPUT_TYPE", pos)
                     intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
 

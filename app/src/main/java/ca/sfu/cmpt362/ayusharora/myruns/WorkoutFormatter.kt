@@ -36,14 +36,21 @@ object WorkoutFormatter {
     val distance: String
         get() = "$distanceValue $distanceUnit"
 
+    val avgSpeed: String
+        get() = "$speedVal $speedUnit"
+
     val calories: String
         get() = "${this.roundToTwoPlaces(entry.calorie)} kcal"
+
+    val climb: String
+        get() = "$climbVal $distanceUnit"
 
     val heartRate: String
         get() = "${this.roundToTwoPlaces(entry.heartRate)} bpm"
 
     val comment: String
         get() = entry.comment
+
 
     private val distanceValue: Double
         get() = if (shouldConvert) {
@@ -52,9 +59,26 @@ object WorkoutFormatter {
             entry.distance
         }
 
-    // Returns unit string based on shouldConvert flag
+    private val speedVal: Double
+        get() = if(shouldConvert){
+            this.convertKilometersToMiles(entry.avgSpeed)
+        } else {
+            entry.avgSpeed
+        }
+
+    private val climbVal: Double
+        get() = if (shouldConvert){
+            this.convertKilometersToMiles(entry.climb)
+        } else {
+            entry.climb
+        }
+
+    // Returns unit strings based on shouldConvert flag
     val distanceUnit: String
         get() = if (shouldConvert) "mi" else "km"
+
+    val speedUnit: String
+        get() = "$distanceUnit/h"
 
 
     fun convertToImperial(){
@@ -92,15 +116,15 @@ object WorkoutFormatter {
     }
 
     // miles -> kilometers
-    fun convertMilesToKilometers (distanceInMiles: Double ) :Double {
+    fun convertMilesToKilometers (mileValue: Double ) :Double {
 
-        return "%.3f".format(distanceInMiles * 1.60934).toDouble()
+        return "%.3f".format(mileValue * 1.60934).toDouble()
     }
 
     // kilometers -> miles
-    fun convertKilometersToMiles (distanceInKilometers: Double ) :Double {
+    fun convertKilometersToMiles (kilometerValue: Double ) :Double {
 
-        return "%.3f".format(distanceInKilometers / 1.60934).toDouble()
+        return "%.3f".format(kilometerValue / 1.60934).toDouble()
     }
 
 }

@@ -6,11 +6,13 @@ import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import com.google.android.gms.maps.model.LatLng
 
 class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
     private var trackingService: TrackingService? = null
+    val entry: ExerciseEntry = ExerciseEntry()
 
     private val _currentLocation = MutableLiveData<LatLng>()
     val currentLocation: LiveData<LatLng>
@@ -22,6 +24,8 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
         trackingService = binder.getService()
 
         binder.setLocationUpdateListener { location ->
+
+            entry.locationList.add(location)
             _currentLocation.postValue(location)
         }
     }

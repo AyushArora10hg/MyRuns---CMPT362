@@ -4,17 +4,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 
-class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val TAG = "MapDisplayActivity"
@@ -28,7 +34,11 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
     private var mapCentered = false
 
-    private lateinit var  markerOptions: MarkerOptions
+    private var startMarker: Marker? = null
+
+    private var endMarker : Marker? = null
+
+    private var polyline: Polyline? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,20 +46,19 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
         observeLocationChanges()
         showGoogleMap()
+        setupStatsHUD()
         handleButtonClicks()
         startTrackingService()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.setOnMapLongClickListener(this)
         Log.d(TAG, "Map is ready")
 
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
-        markerOptions = MarkerOptions()
     }
 
     private fun observeLocationChanges(){
@@ -59,6 +68,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
             Log.d(TAG, "New location received from ViewModel: $location")
             updateMapWithCurrentLocation(location)
         }
+        mapDisplayViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
+        mapDisplayViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
     }
 
     private fun showGoogleMap() {
@@ -77,20 +88,32 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
     private fun updateMapWithCurrentLocation(location: LatLng) {
 
-        markerOptions.position(location)
-        mMap.addMarker(markerOptions)
+        if(mapDisplayViewModel.entry.locationList.size == 1){
+            startMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(location)
+                    .title("Start")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+            )
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
+            mapCentered = true
+        } else {
+                endMarker?.remove()
+
+                endMarker = mMap.addMarker(
+                    MarkerOptions()
+                        .position(location)
+                        .title("Current")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                )
+                updatePolyline()
+            }
 
         if (!mapCentered) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
             mapCentered = true
             Log.d(TAG, "Map centered on first location")
         }
-    }
-
-    override fun onMapLongClick(latLng: LatLng) {
-        markerOptions.position(latLng)
-        mMap.addMarker(markerOptions)
-        Log.d(TAG, "Manual marker added at: $latLng")
     }
 
     private fun handleButtonClicks() {
@@ -126,5 +149,40 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
             unbindService(mapDisplayViewModel)
             isBound = false
         }
+    }
+
+    private fun updatePolyline() {
+        polyline?.remove()
+
+        polyline = mMap.addPolyline(
+            PolylineOptions()
+                .addAll(mapDisplayViewModel.entry.locationList)
+                .color(android.graphics.Color.BLACK)
+                .width(10f)
+        )
+    }
+
+    private fun setupStatsHUD() {
+
+        WorkoutFormatter.initialize(this, mapDisplayViewModel.entry)
+
+        val typeTextView = findViewById<TextView>(R.id.md_stats_type)
+        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+
+        val avgSpeedTextView = findViewById<TextView>(R.id.md_stats_average_speed)
+        avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+
+        val curSpeedTextView = findViewById<TextView>(R.id.md_stats_current_speed)
+        curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.speedUnit}"
+
+        val climbTextView = findViewById<TextView>(R.id.md_stats_climb)
+        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
+
+        val calorieTextView = findViewById<TextView>(R.id.md_stats_calories)
+        calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+
+        val distanceTextView = findViewById<TextView>(R.id.md_stats_distance)
+        distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+
     }
 }

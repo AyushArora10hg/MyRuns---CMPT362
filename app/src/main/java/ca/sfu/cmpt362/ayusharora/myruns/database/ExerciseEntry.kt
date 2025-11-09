@@ -31,9 +31,6 @@ data class ExerciseEntry (
     @ColumnInfo(name = "distance")
     var distance: Double = 0.0,                                 // Distance traveled in kms or miles
 
-    @ColumnInfo(name = "average_pace")
-    var avgPace: Double = 0.0,                                  // Average pace
-
     @ColumnInfo(name = "average_speed")
     var avgSpeed: Double = 0.0,                                 // Average speed
 
