@@ -5,10 +5,15 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.ViewModelFactory
 import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
+import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
+import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
+import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -30,7 +35,17 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var distanceTextView: TextView
 
+    private lateinit var curSpeedTextView: TextView
+
+    private lateinit var avgSpeedTextView: TextView
+
+    private lateinit var calorieTextView: TextView
+
+    private lateinit var climbTextView: TextView
+
     private lateinit var mapDisplayViewModel: MapDisplayViewModel
+
+    private lateinit var workoutViewModel: WorkoutViewModel
 
     private lateinit var mMap: GoogleMap
 
@@ -44,13 +59,18 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var polyline: Polyline? = null
 
+    private var shouldShowToast = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
         typeTextView = findViewById(R.id.md_stats_type)
-
         distanceTextView = findViewById(R.id.md_stats_distance)
+        curSpeedTextView = findViewById(R.id.md_stats_current_speed)
+        avgSpeedTextView = findViewById(R.id.md_stats_average_speed)
+        calorieTextView = findViewById(R.id.md_stats_calories)
+        climbTextView = findViewById(R.id.md_stats_climb)
 
         observeLocationChanges()
         showGoogleMap()
@@ -72,20 +92,33 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
+        mapDisplayViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
+        mapDisplayViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+
         WorkoutFormatter.initialize(this, mapDisplayViewModel.entry)
 
         typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
 
         mapDisplayViewModel.currentLocation.observe(this) { location ->
             updateMapWithCurrentLocation(location)
         }
 
-        mapDisplayViewModel.distance.observe(this){dist->
+        mapDisplayViewModel.distance.observe(this){_->
             distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
         }
 
-        mapDisplayViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
-        mapDisplayViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+        mapDisplayViewModel.curSpeed.observe(this){speed ->
+            curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.convertSpeedForDisplay(speed)}"
+        }
+
+        mapDisplayViewModel.avgSpeed.observe(this){_->
+            avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+        }
+
+        mapDisplayViewModel.calories.observe(this){_ ->
+            calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+        }
     }
 
     private fun showGoogleMap() {
@@ -178,19 +211,20 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun manageStatsHUD() {
+    private fun loadAndObserveDatabase(){
 
-        val avgSpeedTextView = findViewById<TextView>(R.id.md_stats_average_speed)
-        avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
-
-        val curSpeedTextView = findViewById<TextView>(R.id.md_stats_current_speed)
-        curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.speedUnit}"
-
-        val climbTextView = findViewById<TextView>(R.id.md_stats_climb)
-        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
-
-        val calorieTextView = findViewById<TextView>(R.id.md_stats_calories)
-        calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
-
+        val db = WorkoutDatabase.getInstance(this)
+        val dao = db.workoutDatabaseDao
+        val repository = WorkoutRepository(dao)
+        val factory = ViewModelFactory(repository)
+        workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
+        workoutViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
+        workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+        workoutViewModel.allWorkouts.observe(this){ workouts->
+            if (shouldShowToast && workouts.isNotEmpty()){
+                Toast.makeText(this, "Entry #${workouts.last().id} saved!", Toast.LENGTH_SHORT).show()
+                shouldShowToast = false
+            }
+        }
     }
 }

@@ -44,10 +44,14 @@ class HistoryFragment : Fragment() {
         arrayAdapter = HistoryAdapter(requireActivity(), arrayList)
         listView.adapter = arrayAdapter
         listView.setOnItemClickListener { parent, view, position, id ->
-            val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
-            intent.putExtra("position", position)
-            startActivity(intent)
-            true
+            val entry: ExerciseEntry = arrayAdapter.getItem(position) as ExerciseEntry
+            if (entry.inputType == 0){
+                val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
+                intent.putExtra("position", position)
+                startActivity(intent)
+                true
+            }
+
         }
     }
 

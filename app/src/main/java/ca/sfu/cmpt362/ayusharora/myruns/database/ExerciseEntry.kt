@@ -17,10 +17,10 @@ data class ExerciseEntry (
     var id: Long = 0L,                                          // Unique ID to each entry
 
     @ColumnInfo(name = "input_type")
-    var inputType: Int = 0,                                     // Manual, GPS or automatic
+    var inputType: Int = -1,                                     // Manual, GPS or automatic
 
     @ColumnInfo(name = "activity_type")
-    var activityType: Int = 0,                                  // Running, cycling etc.
+    var activityType: Int = -1,                                  // Running, cycling etc.
 
     @ColumnInfo(name = "date_time")
     var dateTime: Calendar = Calendar.getInstance(),            // Date and Time ("9:45:12 Oct 18 2025")

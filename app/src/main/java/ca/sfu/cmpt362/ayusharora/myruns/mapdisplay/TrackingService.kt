@@ -29,6 +29,12 @@ class TrackingService : Service(), LocationListener {
 
     private var distance = 0.0
 
+    private var startTime = 0L
+
+    private var avgSpeed = 0.0
+
+    private var calories = 0.0
+
     override fun onCreate() {
         super.onCreate()
         myBinder = MyBinder()
@@ -103,37 +109,55 @@ class TrackingService : Service(), LocationListener {
 
     override fun onLocationChanged(location: Location) {
         currentLocation = LatLng(location.latitude, location.longitude)
+        updateActivityStats()
+
         myBinder.notifyLocationUpdate(currentLocation!!)
-        updateDistance()
+        myBinder.notifyCurrentSpeedUpdate(location.speed * 3.6)
+        myBinder.notifyDistanceUpdate(distance)
+        myBinder.notifyAverageSpeedUpdate(avgSpeed)
+        myBinder.notifyCalorieUpdate(calories)
     }
 
     // ====================================================
 
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.d(TAG, "Service onUnbind() called")
         return true
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "Service onDestroy() called")
         locationManager.removeUpdates(this)
     }
 
-    // Adapted from: https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/
-    private fun updateDistance(){
+    // Distance computation learnt from internet.
+    // (https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/)
+    private fun updateActivityStats(){
 
         if (prevLocation != null){
             distance += SphericalUtil.computeDistanceBetween(prevLocation, currentLocation)/1000.0
-            myBinder.notifyDistanceUpdate(distance)
         }
         prevLocation = currentLocation
+
+        if (startTime == 0L) {
+            startTime = System.currentTimeMillis()
+        }
+
+        val totalTimeSec = (System.currentTimeMillis() - startTime) / 1000.0
+        if (totalTimeSec > 5) {
+            avgSpeed = (distance / totalTimeSec) * 3600.0
+        }
+
+        calories += (distance/1000.0) * (50 + 0.5* avgSpeed)
+
     }
 
     inner class MyBinder : Binder() {
         private var locationUpdateListener: ((LatLng) -> Unit)? = null
         private var distanceUpdateListener: ((Double) -> Unit)? = null
+        private var currentSpeedListener: ((Double) -> Unit)? = null
+        private var avgSpeedListener: ((Double) -> Unit)? = null
+        private var calorieListener: ((Double) -> Unit)? = null
 
         fun getService(): TrackingService {
             return this@TrackingService
@@ -147,12 +171,35 @@ class TrackingService : Service(), LocationListener {
             distanceUpdateListener = listener
         }
 
+        fun setCurrentSpeedListener(listener: (Double) -> Unit) {
+            currentSpeedListener = listener
+        }
+
+        fun setAverageSpeedListener(listener: (Double) -> Unit) {
+            avgSpeedListener = listener
+        }
+
+        fun setCalorieListener(listener: (Double) -> Unit) {
+            calorieListener = listener
+        }
+
         fun notifyLocationUpdate(location: LatLng) {
             locationUpdateListener?.invoke(location)
         }
 
         fun notifyDistanceUpdate(distance : Double){
             distanceUpdateListener?.invoke(distance)
+        }
+
+        fun notifyCurrentSpeedUpdate(speed: Double) {
+            currentSpeedListener?.invoke(speed)
+        }
+
+        fun notifyAverageSpeedUpdate(speed: Double) {
+            avgSpeedListener?.invoke(speed)
+        }
+        fun notifyCalorieUpdate(calories: Double) {
+           calorieListener?.invoke(calories)
         }
     }
 }

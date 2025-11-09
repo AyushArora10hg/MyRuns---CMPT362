@@ -120,6 +120,7 @@ class ManualInputActivity : AppCompatActivity() {
         val repository = WorkoutRepository(dao)
         val factory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
+        workoutViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
         workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
         workoutViewModel.allWorkouts.observe(this){ workouts->
             if (shouldShowToast && workouts.isNotEmpty()){

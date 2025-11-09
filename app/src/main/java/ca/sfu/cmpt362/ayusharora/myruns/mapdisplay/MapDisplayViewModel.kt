@@ -21,6 +21,18 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
     val distance: LiveData<Double>
         get() = _distance
 
+    private val _curSpeed = MutableLiveData<Double>()
+    val curSpeed: LiveData<Double>
+        get() = _curSpeed
+
+    private val _avgSpeed = MutableLiveData<Double>()
+    val avgSpeed: LiveData<Double>
+        get() = _avgSpeed
+
+    private val _calories = MutableLiveData<Double>()
+    val calories: LiveData<Double>
+        get() = _calories
+
     val entry: ExerciseEntry = ExerciseEntry()
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
@@ -36,6 +48,20 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
         binder.setDistanceUpdateListener { dist ->
             _distance.postValue(dist)
             entry.distance = dist
+        }
+
+        binder.setCurrentSpeedListener { curSpeed ->
+            _curSpeed.postValue(curSpeed)
+        }
+
+        binder.setAverageSpeedListener { avgSpeed ->
+            _avgSpeed.postValue(avgSpeed)
+            entry.avgSpeed = avgSpeed
+        }
+
+        binder.setCalorieListener { cal ->
+            _calories.postValue(cal)
+            entry.calorie = cal
         }
     }
 

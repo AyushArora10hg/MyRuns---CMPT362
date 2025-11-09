@@ -21,10 +21,6 @@ object WorkoutFormatter {
         this.entry = entry
     }
 
-    fun updateEntry(newEntry: ExerciseEntry){
-        this.entry = newEntry
-    }
-
     val inputType: String
         get() = inputTypeArray[entry.inputType]
 
@@ -58,16 +54,16 @@ object WorkoutFormatter {
 
     private val distanceValue: Double
         get() = if (shouldConvert) {
-            this.convertKilometersToMiles(entry.distance)
+            roundToTwoPlaces(this.convertKilometersToMiles(entry.distance)).toDouble()
         } else {
-            roundToThreePlaces(entry.distance).toDouble()
+            roundToTwoPlaces(entry.distance).toDouble()
         }
 
     private val speedVal: Double
         get() = if(shouldConvert){
-            this.convertKilometersToMiles(entry.avgSpeed)
+            roundToTwoPlaces(convertKilometersToMiles(entry.avgSpeed)).toDouble()
         } else {
-            entry.avgSpeed
+            roundToTwoPlaces(entry.avgSpeed).toDouble()
         }
 
     private val climbVal: Double
@@ -97,6 +93,11 @@ object WorkoutFormatter {
         return if (shouldConvert) this.convertMilesToKilometers(distance) else distance
     }
 
+    fun convertSpeedForDisplay (speed: Double): String {
+        return if (shouldConvert) "${roundToTwoPlaces(convertKilometersToMiles(speed))} $speedUnit"
+        else "${roundToTwoPlaces(speed)} $speedUnit"
+    }
+
     // Convert date and time from Calendar object to readable string
     // eg. 09:10:55 Oct 23 2025
     private fun formatDateTime(calendar: Calendar): String {
@@ -117,23 +118,18 @@ object WorkoutFormatter {
     // miles -> kilometers
     fun convertMilesToKilometers (mileValue: Double ) :Double {
 
-        return roundToThreePlaces(mileValue * 1.60934).toDouble()
+        return mileValue * 1.60934
     }
 
     // kilometers -> miles
     fun convertKilometersToMiles (kilometerValue: Double ) :Double {
 
-        return roundToThreePlaces(kilometerValue / 1.60934).toDouble()
+        return kilometerValue / 1.60934
     }
 
     private fun roundToTwoPlaces(value: Double): String{
 
         return  "%.2f".format(value)
-    }
-
-    private fun roundToThreePlaces(value: Double): String{
-
-        return  "%.3f".format(value)
     }
 
 }

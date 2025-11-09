@@ -63,6 +63,7 @@ class StartFragment : Fragment() {
             when(pos){
                 0->{
                     val intent = Intent(requireContext(), ManualInputActivity::class.java)
+                    intent.putExtra("INPUT_TYPE", pos)
                     intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
 
