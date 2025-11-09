@@ -57,4 +57,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
 
     implementation(libs.play.services.maps)
+    implementation("com.google.maps.android:android-maps-utils:0.4+")
 }

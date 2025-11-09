@@ -21,6 +21,10 @@ object WorkoutFormatter {
         this.entry = entry
     }
 
+    fun updateEntry(newEntry: ExerciseEntry){
+        this.entry = newEntry
+    }
+
     val inputType: String
         get() = inputTypeArray[entry.inputType]
 
@@ -56,7 +60,7 @@ object WorkoutFormatter {
         get() = if (shouldConvert) {
             this.convertKilometersToMiles(entry.distance)
         } else {
-            entry.distance
+            roundToThreePlaces(entry.distance).toDouble()
         }
 
     private val speedVal: Double
@@ -110,21 +114,26 @@ object WorkoutFormatter {
         return "$min min $sec sec"
     }
 
-    private fun roundToTwoPlaces(value: Double): String{
-
-        return  "%.2f".format(value)
-    }
-
     // miles -> kilometers
     fun convertMilesToKilometers (mileValue: Double ) :Double {
 
-        return "%.3f".format(mileValue * 1.60934).toDouble()
+        return roundToThreePlaces(mileValue * 1.60934).toDouble()
     }
 
     // kilometers -> miles
     fun convertKilometersToMiles (kilometerValue: Double ) :Double {
 
-        return "%.3f".format(kilometerValue / 1.60934).toDouble()
+        return roundToThreePlaces(kilometerValue / 1.60934).toDouble()
+    }
+
+    private fun roundToTwoPlaces(value: Double): String{
+
+        return  "%.2f".format(value)
+    }
+
+    private fun roundToThreePlaces(value: Double): String{
+
+        return  "%.3f".format(value)
     }
 
 }

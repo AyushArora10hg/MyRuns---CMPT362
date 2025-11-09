@@ -26,6 +26,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         const val TAG = "MapDisplayActivity"
     }
 
+    private lateinit var typeTextView: TextView
+
+    private lateinit var distanceTextView: TextView
+
     private lateinit var mapDisplayViewModel: MapDisplayViewModel
 
     private lateinit var mMap: GoogleMap
@@ -44,9 +48,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
+        typeTextView = findViewById(R.id.md_stats_type)
+
+        distanceTextView = findViewById(R.id.md_stats_distance)
+
         observeLocationChanges()
         showGoogleMap()
-        setupStatsHUD()
         handleButtonClicks()
         startTrackingService()
     }
@@ -63,11 +70,20 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun observeLocationChanges(){
 
+
         mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
+        WorkoutFormatter.initialize(this, mapDisplayViewModel.entry)
+
+        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+
         mapDisplayViewModel.currentLocation.observe(this) { location ->
-            Log.d(TAG, "New location received from ViewModel: $location")
             updateMapWithCurrentLocation(location)
         }
+
+        mapDisplayViewModel.distance.observe(this){dist->
+            distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+        }
+
         mapDisplayViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
         mapDisplayViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
     }
@@ -162,12 +178,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun setupStatsHUD() {
-
-        WorkoutFormatter.initialize(this, mapDisplayViewModel.entry)
-
-        val typeTextView = findViewById<TextView>(R.id.md_stats_type)
-        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+    private fun manageStatsHUD() {
 
         val avgSpeedTextView = findViewById<TextView>(R.id.md_stats_average_speed)
         avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
@@ -180,9 +191,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val calorieTextView = findViewById<TextView>(R.id.md_stats_calories)
         calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
-
-        val distanceTextView = findViewById<TextView>(R.id.md_stats_distance)
-        distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
 
     }
 }

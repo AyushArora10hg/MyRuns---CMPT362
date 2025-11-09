@@ -11,6 +11,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.SphericalUtil
+
 class TrackingService : Service(), LocationListener {
 
     companion object {
@@ -22,6 +24,10 @@ class TrackingService : Service(), LocationListener {
     private lateinit var locationManager: LocationManager
 
     private var currentLocation: LatLng? = null
+
+    private var prevLocation : LatLng? = null
+
+    private var distance = 0.0
 
     override fun onCreate() {
         super.onCreate()
@@ -98,6 +104,7 @@ class TrackingService : Service(), LocationListener {
     override fun onLocationChanged(location: Location) {
         currentLocation = LatLng(location.latitude, location.longitude)
         myBinder.notifyLocationUpdate(currentLocation!!)
+        updateDistance()
     }
 
     // ====================================================
@@ -114,8 +121,19 @@ class TrackingService : Service(), LocationListener {
         locationManager.removeUpdates(this)
     }
 
+    // Adapted from: https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/
+    private fun updateDistance(){
+
+        if (prevLocation != null){
+            distance += SphericalUtil.computeDistanceBetween(prevLocation, currentLocation)/1000.0
+            myBinder.notifyDistanceUpdate(distance)
+        }
+        prevLocation = currentLocation
+    }
+
     inner class MyBinder : Binder() {
         private var locationUpdateListener: ((LatLng) -> Unit)? = null
+        private var distanceUpdateListener: ((Double) -> Unit)? = null
 
         fun getService(): TrackingService {
             return this@TrackingService
@@ -125,8 +143,16 @@ class TrackingService : Service(), LocationListener {
             locationUpdateListener = listener
         }
 
+        fun setDistanceUpdateListener(listener: (Double) -> Unit) {
+            distanceUpdateListener = listener
+        }
+
         fun notifyLocationUpdate(location: LatLng) {
             locationUpdateListener?.invoke(location)
+        }
+
+        fun notifyDistanceUpdate(distance : Double){
+            distanceUpdateListener?.invoke(distance)
         }
     }
 }
