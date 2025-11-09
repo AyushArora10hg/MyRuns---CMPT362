@@ -22,4 +22,10 @@ class WorkoutRepository (private val workoutDatabaseDao: WorkoutDatabaseDao) {
             workoutDatabaseDao.deleteWorkout(id)
         }
     }
+
+    fun deleteAll(){
+        CoroutineScope(Dispatchers.IO).launch {
+            workoutDatabaseDao.deleteAll()
+        }
+    }
 }

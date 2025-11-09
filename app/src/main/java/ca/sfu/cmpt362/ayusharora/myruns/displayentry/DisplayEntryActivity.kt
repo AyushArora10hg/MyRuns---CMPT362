@@ -16,6 +16,9 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
 
 class DisplayEntryActivity () : AppCompatActivity() {
 
+    companion object{
+        const val ENTRY_POSITION = "entry_position"
+    }
     // The workout to be displayed by this activity
     private lateinit var entry: ExerciseEntry
 
@@ -49,7 +52,7 @@ class DisplayEntryActivity () : AppCompatActivity() {
     // It grabs all the attributes of that activity from database and displays them
     private fun setupActivityDisplay(){
 
-        val pos = intent.getIntExtra("position", -1)
+        val pos = intent.getIntExtra(ENTRY_POSITION, -1)
 
         workoutViewModel.allWorkouts.observe(this) { workouts ->
             if (pos == -1 || pos < workouts.size) {

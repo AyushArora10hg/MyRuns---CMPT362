@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
+import ca.sfu.cmpt362.ayusharora.myruns.displayentry.DisplayEntryActivity
 import ca.sfu.cmpt362.ayusharora.myruns.manualinput.ManualInputActivity
 import ca.sfu.cmpt362.ayusharora.myruns.mapdisplay.MapDisplayActivity
 
@@ -63,15 +64,16 @@ class StartFragment : Fragment() {
             when(pos){
                 0->{
                     val intent = Intent(requireContext(), ManualInputActivity::class.java)
-                    intent.putExtra("INPUT_TYPE", pos)
-                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
+                    intent.putExtra(ManualInputActivity.INPUT_TYPE, pos)
+                    intent.putExtra(ManualInputActivity.ACTIVITY_TYPE, activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
 
                 }
                 1, 2->{
                     val intent = Intent(requireContext(), MapDisplayActivity::class.java)
-                    intent.putExtra("INPUT_TYPE", pos)
-                    intent.putExtra("ACTIVITY_TYPE", activityTypeSpinner.selectedItemPosition)
+                    intent.putExtra(MapDisplayActivity.MODE, MapDisplayActivity.MODE_TRACKING)
+                    intent.putExtra(MapDisplayActivity.INPUT_TYPE, pos)
+                    intent.putExtra(MapDisplayActivity.ACTIVITY_TYPE, activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
 
                 }

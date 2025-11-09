@@ -18,4 +18,11 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     fun deleteEntry(id: Long){
         repository.delete(id)
     }
+
+    fun deleteAll(){
+        val workouts = allWorkouts.value
+        if (workouts != null && workouts.isNotEmpty())
+            repository.deleteAll()
+    }
+
 }

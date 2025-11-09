@@ -20,6 +20,11 @@ import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity() {
 
+    companion object {
+        const val INPUT_TYPE = "entry_position"
+        const val ACTIVITY_TYPE = "activity_type"
+    }
+
     private lateinit var listView: ListView
     private lateinit var workoutViewModel: WorkoutViewModel
     private var shouldShowToast = false
@@ -120,8 +125,8 @@ class ManualInputActivity : AppCompatActivity() {
         val repository = WorkoutRepository(dao)
         val factory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
-        workoutViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
-        workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
+        workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
+        workoutViewModel.entry.activityType = intent.getIntExtra(ACTIVITY_TYPE, -1)
         workoutViewModel.allWorkouts.observe(this){ workouts->
             if (shouldShowToast && workouts.isNotEmpty()){
                 Toast.makeText(this, "Entry #${workouts.last().id} saved!", Toast.LENGTH_SHORT).show()

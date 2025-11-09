@@ -3,6 +3,7 @@ package ca.sfu.cmpt362.ayusharora.myruns.mapdisplay
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
 import ca.sfu.cmpt362.ayusharora.myruns.ViewModelFactory
 import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
+import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
@@ -20,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
@@ -29,60 +32,214 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val TAG = "MapDisplayActivity"
+        const val MODE = "mode"
+        const val ENTRY_POSITION = "entry_position"
+        const val INPUT_TYPE = "input_type"
+        const val ACTIVITY_TYPE = "activity_type"
+        const val MODE_TRACKING = 0
+        const val MODE_HISTORY = 1
     }
 
+    private var mode = MODE_TRACKING
     private var startTimeMillis = 0L
 
     private lateinit var typeTextView: TextView
-
     private lateinit var distanceTextView: TextView
-
     private lateinit var curSpeedTextView: TextView
-
     private lateinit var avgSpeedTextView: TextView
-
     private lateinit var calorieTextView: TextView
-
     private lateinit var climbTextView: TextView
-
-    private lateinit var mapDisplayViewModel: MapDisplayViewModel
+    private lateinit var saveButton: Button
+    private lateinit var cancelButton: Button
 
     private lateinit var workoutViewModel: WorkoutViewModel
-
     private lateinit var mMap: GoogleMap
-
-    private var isBound = false
-
-    private var mapCentered = false
-
     private var startMarker: Marker? = null
-
     private var endMarker : Marker? = null
-
     private var polyline: Polyline? = null
 
+    // Tracking mode only variables
+    private var mapDisplayViewModel: MapDisplayViewModel? = null
+    private var isBound = false
+    private var mapCentered = false
     private var shouldShowToast = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
-        if (startTimeMillis == 0L){
-            startTimeMillis = System.currentTimeMillis()
-        }
+        mode = intent.getIntExtra(MODE, MODE_TRACKING)
+        Log.d(TAG, "onCreate: mode = $mode")
 
+        initializeViews()
+        loadDatabase()
+        showGoogleMap()
+
+        when (mode) {
+            MODE_TRACKING -> launchTrackingMode()
+            MODE_HISTORY -> launchHistoryMode()
+        }
+    }
+
+    private fun initializeViews() {
         typeTextView = findViewById(R.id.md_stats_type)
         distanceTextView = findViewById(R.id.md_stats_distance)
         curSpeedTextView = findViewById(R.id.md_stats_current_speed)
         avgSpeedTextView = findViewById(R.id.md_stats_average_speed)
         calorieTextView = findViewById(R.id.md_stats_calories)
         climbTextView = findViewById(R.id.md_stats_climb)
+        saveButton = findViewById(R.id.md_button_save)
+        cancelButton = findViewById(R.id.md_button_cancel)
+    }
 
-        loadAndObserveDatabase()
-        observeLocationChanges()
-        showGoogleMap()
+    private fun launchTrackingMode() {
+        Log.d(TAG, "launchTrackingMode")
+
+        if (startTimeMillis == 0L) {
+            startTimeMillis = System.currentTimeMillis()
+        }
+
+        // Initialize entry with input parameters
+        workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
+        workoutViewModel.entry.activityType = intent.getIntExtra(ACTIVITY_TYPE, -1)
+
+        Log.d(TAG, "Input type: ${workoutViewModel.entry.inputType}, Activity type: ${workoutViewModel.entry.activityType}")
+
+        // Observe database for toast notification
+        workoutViewModel.allWorkouts.observe(this) { workouts ->
+            if (shouldShowToast && workouts.isNotEmpty()) {
+                Toast.makeText(this, "Entry #${workouts.last().id} saved!", Toast.LENGTH_SHORT).show()
+                shouldShowToast = false
+            }
+        }
+
         handleButtonClicks()
+        initializeMapDisplayViewModel()
+        observeLocationChanges()
         startTrackingService()
+    }
+
+    private fun launchHistoryMode() {
+        Log.d(TAG, "launchHistoryMode")
+
+        saveButton.visibility = View.GONE
+        cancelButton.visibility = View.GONE
+
+        val pos = intent.getIntExtra(ENTRY_POSITION, -1)
+        Log.d(TAG, "Entry position: $pos")
+
+        workoutViewModel.allWorkouts.observe(this) { workouts ->
+            if (pos != -1 && pos < workouts.size) {
+                val entry = workouts[pos]
+                displayHistoryEntry(entry)
+            } else {
+                Log.e(TAG, "Invalid entry position: $pos")
+            }
+        }
+    }
+
+    private fun displayHistoryEntry(entry: ExerciseEntry) {
+        WorkoutFormatter.initialize(this, entry)
+
+        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+        distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+        curSpeedTextView.text = "Current Speed: N/A"
+        avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+        calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
+
+        if (::mMap.isInitialized) {
+            displayActivityTrace(entry)
+        }
+    }
+
+    private fun displayActivityTrace(entry: ExerciseEntry) {
+        if (entry.locationList.isEmpty()) return
+
+        Log.d(TAG, "Displaying trace with ${entry.locationList.size} points")
+
+        startMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(entry.locationList.first())
+                .title("Start")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
+
+        if (entry.locationList.size > 1) {
+            endMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(entry.locationList.last())
+                    .title("End")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            )
+
+            polyline = mMap.addPolyline(
+                PolylineOptions()
+                    .addAll(entry.locationList)
+                    .color(android.graphics.Color.BLUE)
+                    .width(10f)
+            )
+        }
+
+        centerMapOnRoute(entry.locationList)
+    }
+
+    private fun centerMapOnRoute(locations: ArrayList<LatLng>) {
+        if (locations.isEmpty()) return
+
+        if (locations.size == 1) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locations.first(), 17f))
+        } else {
+            val builder = LatLngBounds.Builder()
+            locations.forEach { builder.include(it) }
+            val bounds = builder.build()
+            val padding = 100 // pixels
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+        }
+    }
+
+    private fun initializeMapDisplayViewModel() {
+        Log.d(TAG, "Initializing MapDisplayViewModel")
+        mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
+    }
+
+    private fun observeLocationChanges() {
+        mapDisplayViewModel?.let { viewModel ->
+            WorkoutFormatter.initialize(this, workoutViewModel.entry)
+            typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
+            climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
+
+            viewModel.currentLocation.observe(this) { location ->
+                Log.d(TAG, "Location update: $location")
+                updateMapWithCurrentLocation(location)
+                workoutViewModel.entry.locationList.add(location)
+            }
+
+            viewModel.distance.observe(this) { d ->
+                workoutViewModel.entry.distance = d
+                WorkoutFormatter.initialize(this, workoutViewModel.entry)
+                distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+            }
+
+            viewModel.curSpeed.observe(this) { speed ->
+                curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.convertSpeedForDisplay(speed)}"
+            }
+
+            viewModel.avgSpeed.observe(this) { s ->
+                workoutViewModel.entry.avgSpeed = s
+                WorkoutFormatter.initialize(this, workoutViewModel.entry)
+                avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+            }
+
+            viewModel.calories.observe(this) { cal ->
+                workoutViewModel.entry.calorie = cal
+                WorkoutFormatter.initialize(this, workoutViewModel.entry)
+                calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+            }
+        } ?: run {
+            Log.e(TAG, "MapDisplayViewModel is null!")
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -92,123 +249,59 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-
-    }
-
-    private fun observeLocationChanges(){
-
-
-        mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
-
-        WorkoutFormatter.initialize(this, workoutViewModel.entry)
-
-        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
-        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
-
-        mapDisplayViewModel.currentLocation.observe(this) { location ->
-            updateMapWithCurrentLocation(location)
-            workoutViewModel.entry.locationList.add(location)
-        }
-
-        mapDisplayViewModel.distance.observe(this){d->
-            distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
-            workoutViewModel.entry.distance = d
-        }
-
-        mapDisplayViewModel.curSpeed.observe(this){speed ->
-            curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.convertSpeedForDisplay(speed)}"
-        }
-
-        mapDisplayViewModel.avgSpeed.observe(this){s->
-            avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
-            workoutViewModel.entry.avgSpeed = s
-        }
-
-        mapDisplayViewModel.calories.observe(this){cal ->
-            calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
-            workoutViewModel.entry.calorie = cal
-        }
     }
 
     private fun showGoogleMap() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.md_fragment_container)
                 as SupportMapFragment
         mapFragment.getMapAsync(this)
-        Log.d(TAG, "getMapAsync called")
     }
 
     private fun startTrackingService() {
+        Log.d(TAG, "Starting tracking service")
 
-        val serviceIntent = Intent(this, TrackingService::class.java)
-        startService(serviceIntent)
-        bindService(serviceIntent, mapDisplayViewModel, BIND_AUTO_CREATE)
+        mapDisplayViewModel?.let { viewModel ->
+            val serviceIntent = Intent(this, TrackingService::class.java)
+            startService(serviceIntent)
+            bindService(serviceIntent, viewModel, BIND_AUTO_CREATE)
+            isBound = true
+            Log.d(TAG, "Service started and bound")
+        } ?: run {
+            Log.e(TAG, "Cannot start service - MapDisplayViewModel is null")
+        }
     }
 
     private fun updateMapWithCurrentLocation(location: LatLng) {
+        if (!::mMap.isInitialized) {
+            Log.w(TAG, "Map not ready yet")
+            return
+        }
 
-        if(workoutViewModel.entry.locationList.size == 1){
+        if (workoutViewModel.entry.locationList.size == 1) {
             startMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(location)
                     .title("Start")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
             mapCentered = true
+            Log.d(TAG, "Start marker placed at $location")
         } else {
-                endMarker?.remove()
+            endMarker?.remove()
 
-                endMarker = mMap.addMarker(
-                    MarkerOptions()
-                        .position(location)
-                        .title("Current")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                )
-                updatePolyline()
-            }
+            endMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(location)
+                    .title("Current")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            )
+            updatePolyline()
+        }
 
         if (!mapCentered) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
             mapCentered = true
-            Log.d(TAG, "Map centered on first location")
-        }
-    }
-
-    private fun handleButtonClicks() {
-        val saveButton = findViewById<Button>(R.id.md_button_save)
-        saveButton.setOnClickListener {
-            val duration = (System.currentTimeMillis() - startTimeMillis)/60000.0
-            workoutViewModel.entry.duration = duration
-            workoutViewModel.insert()
-            shouldShowToast = true
-            stopTrackingAndFinish()
-        }
-
-        val cancelButton = findViewById<Button>(R.id.md_button_cancel)
-        cancelButton.setOnClickListener {
-            Log.d(TAG, "Cancel button clicked")
-            stopTrackingAndFinish()
-        }
-    }
-
-    private fun stopTrackingAndFinish() {
-
-        if (isBound) {
-            unbindService(mapDisplayViewModel)
-            isBound = false
-        }
-
-        val serviceIntent = Intent(this, TrackingService::class.java)
-        stopService(serviceIntent)
-
-        finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isBound) {
-            unbindService(mapDisplayViewModel)
-            isBound = false
         }
     }
 
@@ -223,20 +316,54 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun loadAndObserveDatabase(){
+    private fun stopTrackingAndFinish() {
+        Log.d(TAG, "Stopping tracking")
 
+        if (isBound) {
+            mapDisplayViewModel?.let { unbindService(it) }
+            isBound = false
+            Log.d(TAG, "Service unbound")
+        }
+
+        val serviceIntent = Intent(this, TrackingService::class.java)
+        stopService(serviceIntent)
+
+        finish()
+    }
+
+    private fun handleButtonClicks() {
+        saveButton.setOnClickListener {
+            Log.d(TAG, "Save button clicked")
+            val duration = (System.currentTimeMillis() - startTimeMillis) / 60000.0
+            workoutViewModel.entry.duration = duration
+            workoutViewModel.insert()
+            shouldShowToast = true
+            stopTrackingAndFinish()
+        }
+
+        cancelButton.setOnClickListener {
+            Log.d(TAG, "Cancel button clicked")
+            stopTrackingAndFinish()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy")
+
+        if (isBound && mode == MODE_TRACKING) {
+            mapDisplayViewModel?.let { unbindService(it) }
+            isBound = false
+            Log.d(TAG, "Service unbound in onDestroy")
+        }
+    }
+
+    private fun loadDatabase() {
         val db = WorkoutDatabase.getInstance(this)
         val dao = db.workoutDatabaseDao
         val repository = WorkoutRepository(dao)
         val factory = ViewModelFactory(repository)
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
-        workoutViewModel.entry.inputType = intent.getIntExtra("INPUT_TYPE", -1)
-        workoutViewModel.entry.activityType = intent.getIntExtra("ACTIVITY_TYPE", -1)
-        workoutViewModel.allWorkouts.observe(this){ workouts->
-            if (shouldShowToast && workouts.isNotEmpty()){
-                Toast.makeText(this, "Entry #${workouts.last().id} saved!", Toast.LENGTH_SHORT).show()
-                shouldShowToast = false
-            }
-        }
+        Log.d(TAG, "Database loaded")
     }
 }

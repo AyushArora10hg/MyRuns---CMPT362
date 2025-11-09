@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,6 +19,7 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
 import ca.sfu.cmpt362.ayusharora.myruns.displayentry.DisplayEntryActivity
+import ca.sfu.cmpt362.ayusharora.myruns.mapdisplay.MapDisplayActivity
 
 //Code adapted from XD's demo code (static fragment)
 class HistoryFragment : Fragment() {
@@ -25,10 +27,13 @@ class HistoryFragment : Fragment() {
     // adapter to load elements
     private lateinit var arrayAdapter: HistoryAdapter
 
+    private lateinit var workoutViewModel: WorkoutViewModel
+
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view =  inflater.inflate(R.layout.fragment_history, container, false)
 
         setupListView(view)
+        handleButtonClick(view)
         observeDatabase()
 
         return view
@@ -47,11 +52,24 @@ class HistoryFragment : Fragment() {
             val entry: ExerciseEntry = arrayAdapter.getItem(position) as ExerciseEntry
             if (entry.inputType == 0){
                 val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
-                intent.putExtra("position", position)
+                intent.putExtra(DisplayEntryActivity.ENTRY_POSITION, position)
+                startActivity(intent)
+                true
+            } else {
+                val intent = Intent (requireContext(), MapDisplayActivity::class.java)
+                intent.putExtra(MapDisplayActivity.MODE, MapDisplayActivity.MODE_HISTORY)
+                intent.putExtra(MapDisplayActivity.ENTRY_POSITION, position)
                 startActivity(intent)
                 true
             }
 
+        }
+    }
+
+    private fun handleButtonClick(view : View){
+        val deleteButton : Button = view.findViewById(R.id.history_button_delete)
+        deleteButton.setOnClickListener {
+            workoutViewModel.deleteAll()
         }
     }
 
@@ -63,7 +81,7 @@ class HistoryFragment : Fragment() {
         val dao = db.workoutDatabaseDao
         val repository = WorkoutRepository(dao)
         val viewModelFactory = ViewModelFactory(repository)
-        val workoutViewModel = ViewModelProvider (requireActivity(), viewModelFactory)[WorkoutViewModel::class.java]
+        workoutViewModel = ViewModelProvider (requireActivity(), viewModelFactory)[WorkoutViewModel::class.java]
 
         workoutViewModel.allWorkouts.observe(requireActivity(), Observer { it ->
             arrayAdapter.replace(it)
