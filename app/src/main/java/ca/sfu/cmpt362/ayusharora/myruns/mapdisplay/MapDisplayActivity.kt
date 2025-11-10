@@ -317,12 +317,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun stopTrackingAndFinish() {
-        Log.d(TAG, "Stopping tracking")
 
         if (isBound) {
             mapDisplayViewModel?.let { unbindService(it) }
             isBound = false
-            Log.d(TAG, "Service unbound")
         }
 
         val serviceIntent = Intent(this, TrackingService::class.java)

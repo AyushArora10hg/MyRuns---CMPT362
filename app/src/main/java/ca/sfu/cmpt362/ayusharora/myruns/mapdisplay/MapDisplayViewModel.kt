@@ -2,7 +2,10 @@ package ca.sfu.cmpt362.ayusharora.myruns.mapdisplay
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +14,7 @@ import com.google.android.gms.maps.model.LatLng
 class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
     private var trackingService: TrackingService? = null
+    private var myMessageHandler: MyMessageHandler = MyMessageHandler(Looper.getMainLooper())
 
     private val _currentLocation = MutableLiveData<LatLng>()
     val currentLocation: LiveData<LatLng>
@@ -33,33 +37,51 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
         get() = _calories
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
+        println("debug: ViewModel: onServiceConnected() called; ComponentName: $name")
 
         val binder = iBinder as TrackingService.MyBinder
         trackingService = binder.getService()
 
-        binder.setLocationUpdateListener { location ->
-            _currentLocation.postValue(location)
-        }
-
-        binder.setDistanceUpdateListener { dist ->
-            _distance.postValue(dist)
-        }
-
-        binder.setCurrentSpeedListener { curSpeed ->
-            _curSpeed.postValue(curSpeed)
-        }
-
-        binder.setAverageSpeedListener { avgSpeed ->
-            _avgSpeed.postValue(avgSpeed)
-        }
-
-        binder.setCalorieListener { cal ->
-            _calories.postValue(cal)
-        }
+        // Pass the message handler to the service
+        binder.setMsgHandler(myMessageHandler)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+        println("debug: ViewModel: onServiceDisconnected() called")
         trackingService = null
     }
 
+    inner class MyMessageHandler(looper: Looper) : Handler(looper) {
+        override fun handleMessage(msg: Message) {
+            val bundle = msg.data
+
+            when (msg.what) {
+                TrackingService.MSG_LOCATION_UPDATE -> {
+                    val latitude = bundle.getDouble(TrackingService.KEY_LATITUDE)
+                    val longitude = bundle.getDouble(TrackingService.KEY_LONGITUDE)
+                    _currentLocation.value = LatLng(latitude, longitude)
+                }
+
+                TrackingService.MSG_DISTANCE_UPDATE -> {
+                    val distance = bundle.getDouble(TrackingService.KEY_DISTANCE)
+                    _distance.value = distance
+                }
+
+                TrackingService.MSG_CURRENT_SPEED_UPDATE -> {
+                    val speed = bundle.getDouble(TrackingService.KEY_CURRENT_SPEED)
+                    _curSpeed.value = speed
+                }
+
+                TrackingService.MSG_AVERAGE_SPEED_UPDATE -> {
+                    val speed = bundle.getDouble(TrackingService.KEY_AVERAGE_SPEED)
+                    _avgSpeed.value = speed
+                }
+
+                TrackingService.MSG_CALORIE_UPDATE -> {
+                    val calories = bundle.getDouble(TrackingService.KEY_CALORIES)
+                    _calories.value = calories
+                }
+            }
+        }
+    }
 }

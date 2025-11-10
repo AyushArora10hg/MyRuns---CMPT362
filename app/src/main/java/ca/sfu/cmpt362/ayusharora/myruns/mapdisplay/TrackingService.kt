@@ -7,6 +7,8 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Binder
+import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -17,22 +19,33 @@ class TrackingService : Service(), LocationListener {
 
     companion object {
         const val TAG = "TrackingService"
+
+        // Message types
+        const val MSG_LOCATION_UPDATE = 0
+        const val MSG_DISTANCE_UPDATE = 1
+        const val MSG_CURRENT_SPEED_UPDATE = 2
+        const val MSG_AVERAGE_SPEED_UPDATE = 3
+        const val MSG_CALORIE_UPDATE = 4
+
+        // Bundle keys
+        const val KEY_LATITUDE = "latitude"
+        const val KEY_LONGITUDE = "longitude"
+        const val KEY_DISTANCE = "distance"
+        const val KEY_CURRENT_SPEED = "current_speed"
+        const val KEY_AVERAGE_SPEED = "average_speed"
+        const val KEY_CALORIES = "calories"
     }
 
     private lateinit var myBinder: MyBinder
+    private var msgHandler: Handler? = null
 
     private lateinit var locationManager: LocationManager
 
     private var currentLocation: LatLng? = null
-
-    private var prevLocation : LatLng? = null
-
+    private var prevLocation: LatLng? = null
     private var distance = 0.0
-
     private var startTime = 0L
-
     private var avgSpeed = 0.0
-
     private var calories = 0.0
 
     override fun onCreate() {
@@ -48,6 +61,16 @@ class TrackingService : Service(), LocationListener {
 
     override fun onBind(intent: Intent?): IBinder {
         return myBinder
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        msgHandler = null
+        return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        locationManager.removeUpdates(this)
     }
 
     private fun startLocationUpdates() {
@@ -94,46 +117,96 @@ class TrackingService : Service(), LocationListener {
         try {
             val gpsLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             val netLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-            val lastLocation = gpsLoc?:netLoc
+            val lastLocation = gpsLoc ?: netLoc
 
             if (lastLocation != null && System.currentTimeMillis() - lastLocation.time < 2000) {
                 onLocationChanged(lastLocation)
             }
-
         } catch (e: Exception) {
             Log.e(TAG, "Error getting last known location", e)
         }
     }
 
-
     override fun onLocationChanged(location: Location) {
         currentLocation = LatLng(location.latitude, location.longitude)
         updateActivityStats()
 
-        myBinder.notifyLocationUpdate(currentLocation!!)
-        myBinder.notifyCurrentSpeedUpdate(location.speed * 3.6)
-        myBinder.notifyDistanceUpdate(distance)
-        myBinder.notifyAverageSpeedUpdate(avgSpeed)
-        myBinder.notifyCalorieUpdate(calories)
+        if (msgHandler != null) {
+            sendLocationUpdate(currentLocation!!)
+            sendCurrentSpeedUpdate(location.speed * 3.6)
+            sendDistanceUpdate(distance)
+            sendAverageSpeedUpdate(avgSpeed)
+            sendCalorieUpdate(calories)
+        }
     }
 
-    // ====================================================
-
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        return true
+    private fun sendLocationUpdate(location: LatLng) {
+        msgHandler?.let { handler ->
+            val bundle = Bundle().apply {
+                putDouble(KEY_LATITUDE, location.latitude)
+                putDouble(KEY_LONGITUDE, location.longitude)
+            }
+            val message = handler.obtainMessage().apply {
+                what = MSG_LOCATION_UPDATE
+                data = bundle
+            }
+            handler.sendMessage(message)
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        locationManager.removeUpdates(this)
+    private fun sendDistanceUpdate(distance: Double) {
+        msgHandler?.let { handler ->
+            val bundle = Bundle().apply {
+                putDouble(KEY_DISTANCE, distance)
+            }
+            val message = handler.obtainMessage().apply {
+                what = MSG_DISTANCE_UPDATE
+                data = bundle
+            }
+            handler.sendMessage(message)
+        }
     }
 
-    // Distance computation learnt from internet.
-    // (https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/)
+    private fun sendCurrentSpeedUpdate(speed: Double) {
+        msgHandler?.let { handler ->
+            val bundle = Bundle().apply {
+                putDouble(KEY_CURRENT_SPEED, speed)
+            }
+            val message = handler.obtainMessage().apply {
+                what = MSG_CURRENT_SPEED_UPDATE
+                data = bundle
+            }
+            handler.sendMessage(message)
+        }
+    }
+
+    private fun sendAverageSpeedUpdate(speed: Double) {
+        msgHandler?.let { handler ->
+            val bundle = Bundle().apply {
+                putDouble(KEY_AVERAGE_SPEED, speed)
+            }
+            val message = handler.obtainMessage().apply {
+                what = MSG_AVERAGE_SPEED_UPDATE
+                data = bundle
+            }
+            handler.sendMessage(message)
+        }
+    }
+
+    private fun sendCalorieUpdate(calories: Double) {
+        msgHandler?.let { handler ->
+            val bundle = Bundle().apply {
+                putDouble(KEY_CALORIES, calories)
+            }
+            val message = handler.obtainMessage().apply {
+                what = MSG_CALORIE_UPDATE
+                data = bundle
+            }
+            handler.sendMessage(message)
+        }
+    }
+
     private fun updateActivityStats() {
-
         if (startTime == 0L) {
             startTime = System.currentTimeMillis()
         }
@@ -151,53 +224,12 @@ class TrackingService : Service(), LocationListener {
     }
 
     inner class MyBinder : Binder() {
-        private var locationUpdateListener: ((LatLng) -> Unit)? = null
-        private var distanceUpdateListener: ((Double) -> Unit)? = null
-        private var currentSpeedListener: ((Double) -> Unit)? = null
-        private var avgSpeedListener: ((Double) -> Unit)? = null
-        private var calorieListener: ((Double) -> Unit)? = null
+        fun setMsgHandler(handler: Handler) {
+            this@TrackingService.msgHandler = handler
+        }
 
         fun getService(): TrackingService {
             return this@TrackingService
-        }
-
-        fun setLocationUpdateListener(listener: (LatLng) -> Unit) {
-            locationUpdateListener = listener
-        }
-
-        fun setDistanceUpdateListener(listener: (Double) -> Unit) {
-            distanceUpdateListener = listener
-        }
-
-        fun setCurrentSpeedListener(listener: (Double) -> Unit) {
-            currentSpeedListener = listener
-        }
-
-        fun setAverageSpeedListener(listener: (Double) -> Unit) {
-            avgSpeedListener = listener
-        }
-
-        fun setCalorieListener(listener: (Double) -> Unit) {
-            calorieListener = listener
-        }
-
-        fun notifyLocationUpdate(location: LatLng) {
-            locationUpdateListener?.invoke(location)
-        }
-
-        fun notifyDistanceUpdate(distance : Double){
-            distanceUpdateListener?.invoke(distance)
-        }
-
-        fun notifyCurrentSpeedUpdate(speed: Double) {
-            currentSpeedListener?.invoke(speed)
-        }
-
-        fun notifyAverageSpeedUpdate(speed: Double) {
-            avgSpeedListener?.invoke(speed)
-        }
-        fun notifyCalorieUpdate(calories: Double) {
-           calorieListener?.invoke(calories)
         }
     }
 }
