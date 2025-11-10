@@ -87,19 +87,6 @@ class TrackingService : Service(), LocationListener {
             return
         }
 
-        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            try {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    0L,
-                    0f,
-                    this
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Error requesting NETWORK_PROVIDER updates", e)
-            }
-        }
-
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             try {
                 locationManager.requestLocationUpdates(
@@ -115,9 +102,7 @@ class TrackingService : Service(), LocationListener {
         }
 
         try {
-            val gpsLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val netLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            val lastLocation = gpsLoc ?: netLoc
+            val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
             if (lastLocation != null && System.currentTimeMillis() - lastLocation.time < 2000) {
                 onLocationChanged(lastLocation)
