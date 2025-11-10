@@ -49,8 +49,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var avgSpeedTextView: TextView
     private lateinit var calorieTextView: TextView
     private lateinit var climbTextView: TextView
-    private lateinit var saveButton: Button
-    private lateinit var cancelButton: Button
 
     private lateinit var workoutViewModel: WorkoutViewModel
     private lateinit var mMap: GoogleMap
@@ -61,8 +59,14 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     // Tracking mode only variables
     private var mapDisplayViewModel: MapDisplayViewModel? = null
     private var isBound = false
-    private var mapCentered = false
     private var shouldShowToast = false
+    private lateinit var saveButton: Button
+    private lateinit var cancelButton: Button
+    private var startPlaced = false
+
+    // History mode only variables
+    private lateinit var historyEntry: ExerciseEntry
+    private lateinit var deleteButton: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,12 +93,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         avgSpeedTextView = findViewById(R.id.md_stats_average_speed)
         calorieTextView = findViewById(R.id.md_stats_calories)
         climbTextView = findViewById(R.id.md_stats_climb)
+
         saveButton = findViewById(R.id.md_button_save)
         cancelButton = findViewById(R.id.md_button_cancel)
+        deleteButton = findViewById(R.id.md_button_delete)
     }
 
     private fun launchTrackingMode() {
-        Log.d(TAG, "launchTrackingMode")
+
+        handleSaveAndCancelButtons()
+        deleteButton.visibility = View.GONE
 
         if (startTimeMillis == 0L) {
             startTimeMillis = System.currentTimeMillis()
@@ -114,33 +122,32 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        handleButtonClicks()
+
         initializeMapDisplayViewModel()
         observeLocationChanges()
         startTrackingService()
     }
 
     private fun launchHistoryMode() {
-        Log.d(TAG, "launchHistoryMode")
-
         saveButton.visibility = View.GONE
         cancelButton.visibility = View.GONE
+        handleDeleteButton()
 
         val pos = intent.getIntExtra(ENTRY_POSITION, -1)
         Log.d(TAG, "Entry position: $pos")
 
         workoutViewModel.allWorkouts.observe(this) { workouts ->
             if (pos != -1 && pos < workouts.size) {
-                val entry = workouts[pos]
-                displayHistoryEntry(entry)
+                historyEntry = workouts[pos]
+                displayHistoryEntry()
             } else {
                 Log.e(TAG, "Invalid entry position: $pos")
             }
         }
     }
 
-    private fun displayHistoryEntry(entry: ExerciseEntry) {
-        WorkoutFormatter.initialize(this, entry)
+    private fun displayHistoryEntry() {
+        WorkoutFormatter.initialize(this, historyEntry)
 
         typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
         distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
@@ -150,39 +157,39 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
 
         if (::mMap.isInitialized) {
-            displayActivityTrace(entry)
+            displayActivityTrace()
         }
     }
 
-    private fun displayActivityTrace(entry: ExerciseEntry) {
-        if (entry.locationList.isEmpty()) return
+    private fun displayActivityTrace() {
+        if (historyEntry.locationList.isEmpty()) return
 
-        Log.d(TAG, "Displaying trace with ${entry.locationList.size} points")
+        Log.d(TAG, "Displaying trace with ${historyEntry.locationList.size} points")
 
         startMarker = mMap.addMarker(
             MarkerOptions()
-                .position(entry.locationList.first())
+                .position(historyEntry.locationList.first())
                 .title("Start")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         )
 
-        if (entry.locationList.size > 1) {
+        if (historyEntry.locationList.size > 1) {
             endMarker = mMap.addMarker(
                 MarkerOptions()
-                    .position(entry.locationList.last())
+                    .position(historyEntry.locationList.last())
                     .title("End")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             )
 
             polyline = mMap.addPolyline(
                 PolylineOptions()
-                    .addAll(entry.locationList)
-                    .color(android.graphics.Color.BLUE)
+                    .addAll(historyEntry.locationList)
+                    .color(android.graphics.Color.BLACK)
                     .width(10f)
             )
         }
 
-        centerMapOnRoute(entry.locationList)
+        centerMapOnRoute(historyEntry.locationList)
     }
 
     private fun centerMapOnRoute(locations: ArrayList<LatLng>) {
@@ -194,8 +201,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             val builder = LatLngBounds.Builder()
             locations.forEach { builder.include(it) }
             val bounds = builder.build()
-            val padding = 100 // pixels
-            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
         }
     }
 
@@ -211,9 +217,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
 
             viewModel.currentLocation.observe(this) { location ->
-                Log.d(TAG, "Location update: $location")
-                updateMapWithCurrentLocation(location)
                 workoutViewModel.entry.locationList.add(location)
+                updateMapWithCurrentLocation(location)
             }
 
             viewModel.distance.observe(this) { d ->
@@ -272,12 +277,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updateMapWithCurrentLocation(location: LatLng) {
+
         if (!::mMap.isInitialized) {
-            Log.w(TAG, "Map not ready yet")
             return
         }
 
-        if (workoutViewModel.entry.locationList.size == 1) {
+        if (!startPlaced) {
             startMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(location)
@@ -285,24 +290,19 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
-            mapCentered = true
-            Log.d(TAG, "Start marker placed at $location")
+            startPlaced = true
         } else {
             endMarker?.remove()
-
             endMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(location)
                     .title("Current")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             )
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
             updatePolyline()
         }
 
-        if (!mapCentered) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
-            mapCentered = true
-        }
     }
 
     private fun updatePolyline() {
@@ -331,7 +331,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         finish()
     }
 
-    private fun handleButtonClicks() {
+    private fun handleSaveAndCancelButtons() {
         saveButton.setOnClickListener {
             Log.d(TAG, "Save button clicked")
             val duration = (System.currentTimeMillis() - startTimeMillis) / 60000.0
@@ -344,6 +344,14 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         cancelButton.setOnClickListener {
             Log.d(TAG, "Cancel button clicked")
             stopTrackingAndFinish()
+        }
+    }
+
+    private fun handleDeleteButton(){
+
+        deleteButton.setOnClickListener {
+            workoutViewModel.deleteEntry(historyEntry.id)
+            finish()
         }
     }
 

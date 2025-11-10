@@ -97,7 +97,7 @@ class TrackingService : Service(), LocationListener {
 
             val lastLocation = gpsLoc?:netLoc
 
-            if (lastLocation != null) {
+            if (lastLocation != null && System.currentTimeMillis() - lastLocation.time < 2000) {
                 onLocationChanged(lastLocation)
             }
 
@@ -132,24 +132,22 @@ class TrackingService : Service(), LocationListener {
 
     // Distance computation learnt from internet.
     // (https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/)
-    private fun updateActivityStats(){
-
-        if (prevLocation != null){
-            distance += SphericalUtil.computeDistanceBetween(prevLocation, currentLocation)/1000.0
-        }
-        prevLocation = currentLocation
+    private fun updateActivityStats() {
 
         if (startTime == 0L) {
             startTime = System.currentTimeMillis()
         }
-
         val totalTimeSec = (System.currentTimeMillis() - startTime) / 1000.0
-        if (totalTimeSec > 5) {
+
+        if (totalTimeSec < 2) return
+
+        if (prevLocation != null) {
+            val deltaDist = SphericalUtil.computeDistanceBetween(prevLocation, currentLocation) / 1000.0
+            distance += deltaDist
             avgSpeed = (distance / totalTimeSec) * 3600.0
+            calories += deltaDist * 50
         }
-
-        calories += (distance/1000.0) * (50 + 0.5* avgSpeed)
-
+        prevLocation = currentLocation
     }
 
     inner class MyBinder : Binder() {
