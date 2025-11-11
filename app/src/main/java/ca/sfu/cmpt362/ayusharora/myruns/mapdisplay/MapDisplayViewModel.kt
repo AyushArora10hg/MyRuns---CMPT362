@@ -15,6 +15,14 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
     private var myMessageHandler: MyMessageHandler = MyMessageHandler(Looper.getMainLooper())
 
+    var startTimeMillis: Long = 0L
+
+    fun initializeStartTime() {
+        if (startTimeMillis == 0L) {
+            startTimeMillis = System.currentTimeMillis()
+        }
+    }
+
     private val _currentLocation = MutableLiveData<LatLng>()
     val currentLocation: LiveData<LatLng>
         get() = _currentLocation

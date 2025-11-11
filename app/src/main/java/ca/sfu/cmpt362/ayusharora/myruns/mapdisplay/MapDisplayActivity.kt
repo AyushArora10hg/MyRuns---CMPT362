@@ -40,7 +40,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Mode Tracking
     private var mode = MODE_TRACKING
-    private var startTimeMillis = 0L
 
     // Display TextViews : Common to both modes
     private lateinit var typeTextView: TextView
@@ -121,6 +120,54 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        when (mode) {
+            MODE_TRACKING -> {
+                if (workoutViewModel.entry.locationList.isNotEmpty()) {
+                    restoreMapStateFromEntry()
+                }
+            }
+            MODE_HISTORY -> {
+                if (::historyEntry.isInitialized) {
+                    displayActivityTrace()
+                }
+            }
+        }
+    }
+
+    private fun restoreMapStateFromEntry() {
+        val locations = workoutViewModel.entry.locationList
+        if (locations.isEmpty()) return
+
+        startMarker?.remove()
+        endMarker?.remove()
+        polyline?.remove()
+
+        startMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(locations.first())
+                .title("Start")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
+        startPlaced = true
+
+        if (locations.size > 1) {
+            endMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(locations.last())
+                    .title("Current")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            )
+
+            polyline = mMap.addPolyline(
+                PolylineOptions()
+                    .addAll(locations)
+                    .color(android.graphics.Color.BLACK)
+                    .width(10f)
+            )
+        }
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locations.last(), 17f))
     }
 
     override fun onDestroy() {
@@ -138,12 +185,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
 
+        mapDisplayViewModel?.initializeStartTime()
+
         handleSaveAndCancelButtons()
         deleteButton.visibility = View.GONE
 
-        if (startTimeMillis == 0L) {
-            startTimeMillis = System.currentTimeMillis()
-        }
+
 
         workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
         workoutViewModel.entry.activityType = intent.getIntExtra(ACTIVITY_TYPE, -1)
@@ -257,11 +304,13 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun handleSaveAndCancelButtons() {
         saveButton.setOnClickListener {
-            val duration = (System.currentTimeMillis() - startTimeMillis) / 60000.0
-            workoutViewModel.entry.duration = duration
-            workoutViewModel.insert()
-            shouldShowToast = true
-            stopTrackingAndFinish()
+            mapDisplayViewModel?.let { viewModel ->
+                val duration = (System.currentTimeMillis() - viewModel.startTimeMillis) / 60000.0
+                workoutViewModel.entry.duration = duration
+                workoutViewModel.insert()
+                shouldShowToast = true
+                stopTrackingAndFinish()
+            }
         }
 
         cancelButton.setOnClickListener {
@@ -341,7 +390,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             val bounds = builder.build()
             val mapView = (supportFragmentManager.findFragmentById(R.id.md_fragment_container) as SupportMapFragment).view
             mapView?.post {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150))
             }
         }
     }
@@ -349,6 +398,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun handleDeleteButton(){
 
         deleteButton.setOnClickListener {
+            workoutViewModel.allWorkouts.removeObservers(this)
             workoutViewModel.deleteEntry(historyEntry.id)
             finish()
         }
