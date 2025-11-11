@@ -13,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng
 
 class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
-    private var trackingService: TrackingService? = null
     private var myMessageHandler: MyMessageHandler = MyMessageHandler(Looper.getMainLooper())
 
     private val _currentLocation = MutableLiveData<LatLng>()
@@ -38,13 +37,12 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
 
-        val binder = iBinder as TrackingService.MyBinder
-        trackingService = binder.getService()
-        binder.setMsgHandler(myMessageHandler)
+        val tempBinder = iBinder as TrackingService.TrackingBinder
+        tempBinder.setMsgHandler(myMessageHandler)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        trackingService = null
+        myMessageHandler.removeCallbacksAndMessages(null)
     }
 
     inner class MyMessageHandler(looper: Looper) : Handler(looper) {

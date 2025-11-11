@@ -45,7 +45,7 @@ class TrackingService : Service(), LocationListener {
         private const val CHANNEL_ID = "tracking_channel"
     }
 
-    private lateinit var myBinder: MyBinder
+    private lateinit var trackingBinder: TrackingBinder
     private var msgHandler: Handler? = null
 
     private lateinit var locationManager: LocationManager
@@ -60,7 +60,7 @@ class TrackingService : Service(), LocationListener {
 
     override fun onCreate() {
         super.onCreate()
-        myBinder = MyBinder()
+        trackingBinder = TrackingBinder()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         showNotification()
@@ -72,7 +72,7 @@ class TrackingService : Service(), LocationListener {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        return myBinder
+        return trackingBinder
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
@@ -257,13 +257,9 @@ class TrackingService : Service(), LocationListener {
         prevLocation = currentLocation
     }
 
-    inner class MyBinder : Binder() {
+    inner class TrackingBinder : Binder() {
         fun setMsgHandler(handler: Handler) {
             this@TrackingService.msgHandler = handler
-        }
-
-        fun getService(): TrackingService {
-            return this@TrackingService
         }
     }
 }
