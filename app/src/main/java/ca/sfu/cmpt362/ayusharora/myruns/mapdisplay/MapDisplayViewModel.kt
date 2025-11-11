@@ -37,17 +37,13 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
         get() = _calories
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
-        println("debug: ViewModel: onServiceConnected() called; ComponentName: $name")
 
         val binder = iBinder as TrackingService.MyBinder
         trackingService = binder.getService()
-
-        // Pass the message handler to the service
         binder.setMsgHandler(myMessageHandler)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        println("debug: ViewModel: onServiceDisconnected() called")
         trackingService = null
     }
 

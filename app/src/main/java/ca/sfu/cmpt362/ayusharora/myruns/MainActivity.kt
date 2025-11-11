@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -62,12 +63,14 @@ class MainActivity : AppCompatActivity() {
 
     // Ask for user permission
     // Code copied from XD's lecture demos
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun checkPermissions(activity: Activity?) {
         activity ?: return
 
         val permissions = mutableListOf<String>()
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        permissions.add(Manifest.permission.POST_NOTIFICATIONS)
 
         // Camera permission (available on all versions)
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
@@ -76,18 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Storage permissions - different for different Android versions
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Android 13+ uses READ_MEDIA_IMAGES
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_MEDIA_IMAGES)
-                != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
-            }
-        } else {
-            // Android 12 and below use READ_EXTERNAL_STORAGE
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_MEDIA_IMAGES)
+            != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
         }
 
         // Request all needed permissions at once

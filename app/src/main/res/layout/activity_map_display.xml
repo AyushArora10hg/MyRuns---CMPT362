@@ -17,7 +17,7 @@
             android:id="@+id/heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_bar_title"
+            android:text = "@string/heading_map_display"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             style="@style/Widget.MyRuns.HeadingNoBackground"/>
