@@ -59,7 +59,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private var polyline: Polyline? = null
 
     // Tracking mode only variables
-    private var mapDisplayViewModel: MapDisplayViewModel? = null
+    private lateinit var mapDisplayViewModel: MapDisplayViewModel
     private var isBound = false
     private var shouldShowToast = false
     private lateinit var saveButton: Button
@@ -70,23 +70,21 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var historyEntry: ExerciseEntry
     private lateinit var deleteButton: Button
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
         mode = intent.getIntExtra(MODE, MODE_TRACKING)
-
         initializeViews()
         loadDatabase()
         showGoogleMap()
-
         when (mode) {
             MODE_TRACKING -> launchTrackingMode()
             MODE_HISTORY -> launchHistoryMode()
         }
     }
 
+    // Initializes all UI views used by the activity
     private fun initializeViews() {
         typeTextView = findViewById(R.id.md_stats_type)
         distanceTextView = findViewById(R.id.md_stats_distance)
@@ -100,6 +98,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         deleteButton = findViewById(R.id.md_button_delete)
     }
 
+    // Provides database access to this activity
+    // MODE_TRACKING -> needs database access to save the workout
+    // MODE_HISTORY -> needs database access to view a saved workout
     private fun loadDatabase() {
         val db = WorkoutDatabase.getInstance(this)
         val dao = db.workoutDatabaseDao
@@ -108,18 +109,30 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         workoutViewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
     }
 
+    // Helper method to load a Google Map
+    // Code adapted from lecture demos (I_am_here_map_Kotlin)
     private fun showGoogleMap() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.md_fragment_container)
                 as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
+    // Callback invoked when the Google Map is ready to be used.
+    // This method is called after getMapAsync() completes successfully.
+    //
+    // Configures map UI settings and restores/displays the appropriate map state:
+    // - TRACKING MODE: If location data exists , restores markers and polyline to
+    //   show the current workout progress (eg. after rotation).
+    // - HISTORY MODE: If history entry is loaded, displays the complete workout trace.
+    //
+    // Note: This callback may be invoked before historyEntry is initialized in history mode,
+    // so displayActivityTrace() is called again in displayHistoryEntry() if needed
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.uiSettings.isCompassEnabled = true
-        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        mMap = googleMap.apply {
+            uiSettings.isZoomControlsEnabled = true
+            uiSettings.isCompassEnabled = true
+            mapType = GoogleMap.MAP_TYPE_NORMAL
+        }
 
         when (mode) {
             MODE_TRACKING -> {
@@ -135,9 +148,11 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Restores the map state (start marker, end marker, polyline) from
+    // the workout entry in the ViewModel. Used when the activity is
+    // recreated during tracking (e.g., after screen rotation)
     private fun restoreMapStateFromEntry() {
-        val locations = workoutViewModel.entry.locationList
-        if (locations.isEmpty()) return
+        if (workoutViewModel.entry.locationList.isEmpty()) return
 
         startMarker?.remove()
         endMarker?.remove()
@@ -145,52 +160,56 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         startMarker = mMap.addMarker(
             MarkerOptions()
-                .position(locations.first())
+                .position(workoutViewModel.entry.locationList.first())
                 .title("Start")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         )
         startPlaced = true
 
-        if (locations.size > 1) {
+        if (workoutViewModel.entry.locationList.size > 1) {
             endMarker = mMap.addMarker(
                 MarkerOptions()
-                    .position(locations.last())
+                    .position(workoutViewModel.entry.locationList.last())
                     .title("Current")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
             )
 
             polyline = mMap.addPolyline(
                 PolylineOptions()
-                    .addAll(locations)
+                    .addAll(workoutViewModel.entry.locationList)
                     .color(android.graphics.Color.BLACK)
                     .width(10f)
             )
         }
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locations.last(), 17f))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(workoutViewModel.entry.locationList.last(), 17f))
     }
 
+    // Unbinds the tracking service if still bound when the activity is destroyed
+    // to prevent memory leaks. The activity can rebind to the same service again as service
+    // is not killed during changes like screen rotation or app going to background
     override fun onDestroy() {
         super.onDestroy()
 
         if (isBound && mode == MODE_TRACKING) {
-            mapDisplayViewModel?.let { unbindService(it) }
+            unbindService(mapDisplayViewModel)
             isBound = false
         }
     }
 
     // ******************************** TRACKING MODE ****************************************** //
 
+    // Puts the activity into tracking mode
+    // It initializes a MapDisplayViewModel instance for LiveData tracking from service
+    // It overrides listeners of Save and Cancel buttons and hides the Delete button.
+    // Uses WorkoutViewModel to have database access
     private fun launchTrackingMode() {
 
         mapDisplayViewModel = ViewModelProvider(this)[MapDisplayViewModel::class.java]
+        mapDisplayViewModel.initializeStartTime()
 
-        mapDisplayViewModel?.initializeStartTime()
-
-        handleSaveAndCancelButtons()
         deleteButton.visibility = View.GONE
-
-
+        handleSaveAndCancelButtons()
 
         workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
         workoutViewModel.entry.activityType = intent.getIntExtra(ACTIVITY_TYPE, -1)
@@ -201,13 +220,15 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        observeLocationChanges()
+        updateViews()
         startTrackingService()
     }
 
+    // Starts the background TrackingService to record GPS locations, and
+    // binds this activity to receive updates via the MapDisplayViewModel
     private fun startTrackingService() {
 
-        mapDisplayViewModel?.let { viewModel ->
+        mapDisplayViewModel.let { viewModel ->
             val serviceIntent = Intent(this, TrackingService::class.java)
             startService(serviceIntent)
             bindService(serviceIntent, viewModel, BIND_AUTO_CREATE)
@@ -215,13 +236,22 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun observeLocationChanges() {
+    // Observes LiveData in the MapDisplayViewModel and updates its UI
+    // fields and map elements (distance, speed, calories, markers, polylines)
+    // accordingly in real time
+    private fun updateViews() {
 
         WorkoutFormatter.initialize(this, workoutViewModel.entry)
 
-        mapDisplayViewModel?.let { viewModel ->
-            typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
-            climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
+        mapDisplayViewModel.let { viewModel ->
+            typeTextView.text = buildString {
+                append("Type: ")
+                append(WorkoutFormatter.activityType)
+            }
+            climbTextView.text = buildString {
+                append("Climb: ")
+                append(WorkoutFormatter.climb)
+            }
 
             viewModel.currentLocation.observe(this) { location ->
                 workoutViewModel.entry.locationList.add(location)
@@ -230,25 +260,43 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
             viewModel.distance.observe(this) { d ->
                 workoutViewModel.entry.distance = d
-                distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
+                distanceTextView.text = buildString {
+                    append("Distance: ")
+                    append(WorkoutFormatter.distance)
+                }
             }
 
             viewModel.curSpeed.observe(this) { speed ->
-                curSpeedTextView.text = "Current Speed: ${WorkoutFormatter.convertSpeedForDisplay(speed)}"
+                curSpeedTextView.text = buildString {
+                    append("Current Speed: ")
+                    append(WorkoutFormatter.convertSpeedForDisplay(speed))
+                }
             }
 
             viewModel.avgSpeed.observe(this) { s ->
                 workoutViewModel.entry.avgSpeed = s
-                avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
+                avgSpeedTextView.text = buildString {
+                    append("Average Speed: ")
+                    append(WorkoutFormatter.avgSpeed)
+                }
             }
 
             viewModel.calories.observe(this) { cal ->
                 workoutViewModel.entry.calorie = cal
-                calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
+                calorieTextView.text = buildString {
+                    append("Calories: ")
+                    append(WorkoutFormatter.calories)
+                }
             }
         }
     }
 
+    // Helper method to update map elements
+    // - Places a green "start" marker if not yet placed
+    // - Moves the red “current” marker
+    // - Updates the route polyline
+    // - Keeps the camera centered on the latest position
+    // Code adapted from lecture demos (I_am_here_map_Kotlin)
     private fun updateMapWithCurrentLocation(location: LatLng) {
 
         if (!::mMap.isInitialized) {
@@ -278,6 +326,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    // Refreshes the route polyline by redrawing all recorded points.
+    // Called each time a new location update arrives.
     private fun updatePolyline() {
         polyline?.remove()
 
@@ -289,27 +339,36 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    // Stops the tracking service, unbinds it from the activity
     private fun stopTrackingAndFinish() {
 
         if (isBound) {
-            mapDisplayViewModel?.let { unbindService(it) }
+            unbindService(mapDisplayViewModel)
             isBound = false
         }
 
         val serviceIntent = Intent(this, TrackingService::class.java)
         stopService(serviceIntent)
-
         finish()
     }
 
+    // Helper method to handle the Save and Cancel button clicks:
+    // - Save: Inserts the recorded workout into the database
+    // - Cancel: Discards the recording and exits without saving
     private fun handleSaveAndCancelButtons() {
         saveButton.setOnClickListener {
-            mapDisplayViewModel?.let { viewModel ->
-                val duration = (System.currentTimeMillis() - viewModel.startTimeMillis) / 60000.0
-                workoutViewModel.entry.duration = duration
-                workoutViewModel.insert()
-                shouldShowToast = true
+
+            if (workoutViewModel.entry.locationList.isEmpty()){
+                Toast.makeText(this, "No Route to Save!", Toast.LENGTH_SHORT).show()
                 stopTrackingAndFinish()
+            } else {
+                mapDisplayViewModel.let { viewModel ->
+                    val duration = (System.currentTimeMillis() - viewModel.startTimeMillis) / 60000.0
+                    workoutViewModel.entry.duration = duration
+                    workoutViewModel.insert()
+                    shouldShowToast = true
+                    stopTrackingAndFinish()
+                }
             }
         }
 
@@ -320,7 +379,11 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // ******************************** HISTORY MODE ******************************************* //
 
+    // Puts the activity into history mode
+    // It overrides listeners of Delete button and hides the Save and Cancel buttons.
+    // Uses WorkoutViewModel to have database access
     private fun launchHistoryMode() {
+
         saveButton.visibility = View.GONE
         cancelButton.visibility = View.GONE
         handleDeleteButton()
@@ -335,21 +398,44 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // This helper method populate the UI fields (type, distance, average speed, etc.)
+    // by getting the respective values from historyEntry (from database)
+    // If the map is ready, then it displays the trace (markers and polylines) of that
+    // activity too
     private fun displayHistoryEntry() {
         WorkoutFormatter.initialize(this, historyEntry)
 
-        typeTextView.text = "Type: ${WorkoutFormatter.activityType}"
-        distanceTextView.text = "Distance: ${WorkoutFormatter.distance}"
-        curSpeedTextView.text = "Current Speed: N/A"
-        avgSpeedTextView.text = "Average Speed: ${WorkoutFormatter.avgSpeed}"
-        calorieTextView.text = "Calories: ${WorkoutFormatter.calories}"
-        climbTextView.text = "Climb: ${WorkoutFormatter.climb}"
+        typeTextView.text = buildString {
+            append("Type: ")
+            append(WorkoutFormatter.activityType)
+        }
+        distanceTextView.text = buildString {
+            append("Distance: ")
+            append(WorkoutFormatter.distance)
+        }
+        curSpeedTextView.text = buildString {
+            append("Current Speed: N/A")
+        }
+        avgSpeedTextView.text = buildString {
+            append("Average Speed: ")
+            append(WorkoutFormatter.avgSpeed)
+        }
+        calorieTextView.text = buildString {
+            append("Calories: ")
+            append(WorkoutFormatter.calories)
+        }
+        climbTextView.text = buildString {
+            append("Climb: ")
+            append(WorkoutFormatter.climb)
+        }
 
         if (::mMap.isInitialized) {
             displayActivityTrace()
         }
     }
 
+    // Draws the saved workout route (start marker, end marker, and polyline)
+    // for a history entry and centers the map on the full path.
     private fun displayActivityTrace() {
         if (historyEntry.locationList.isEmpty()) return
 
@@ -379,12 +465,19 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         centerMapOnRoute(historyEntry.locationList)
     }
 
+    // Adjusts the map camera to fit the full recorded route.
+    // If only one location exists, zooms directly on it; otherwise,
+    // calculates bounds that include all recorded coordinates.
     private fun centerMapOnRoute(locations: ArrayList<LatLng>) {
         if (locations.isEmpty()) return
 
         if (locations.size == 1) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locations.first(), 17f))
-        } else {
+        }
+        // The following code is written with help of chatGPT
+        // It helps to focus camera on an entire route (multiple locations) by calculating
+        // bounds. The one in class only handled a single co-ordinate
+        else {
             val builder = LatLngBounds.Builder()
             locations.forEach { builder.include(it) }
             val bounds = builder.build()
@@ -395,6 +488,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Handles the Delete button click listener
+    // - Delete: Removes the historyEntry from database
     private fun handleDeleteButton(){
 
         deleteButton.setOnClickListener {

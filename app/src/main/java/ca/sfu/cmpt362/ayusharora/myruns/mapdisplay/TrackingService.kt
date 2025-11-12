@@ -24,15 +24,17 @@ import com.google.maps.android.SphericalUtil
 class TrackingService : Service(), LocationListener {
 
     companion object {
+        // For logging/debugging
         const val TAG = "TrackingService"
 
-        // Message Protocol
+        // Message Types
         const val MSG_LOCATION_UPDATE = 0
         const val MSG_DISTANCE_UPDATE = 1
         const val MSG_CURRENT_SPEED_UPDATE = 2
         const val MSG_AVERAGE_SPEED_UPDATE = 3
         const val MSG_CALORIE_UPDATE = 4
 
+        // Fields that can be updated and sent via messages
         const val KEY_LATITUDE = "latitude"
         const val KEY_LONGITUDE = "longitude"
         const val KEY_DISTANCE = "distance"
@@ -45,12 +47,17 @@ class TrackingService : Service(), LocationListener {
         private const val CHANNEL_ID = "tracking_channel"
     }
 
+    // The interface of service exposed to activities/fragments
     private lateinit var trackingBinder: TrackingBinder
+    // For sending messages: set by the class connected to this service
     private var msgHandler: Handler? = null
 
+    // For getting location updates
     private lateinit var locationManager: LocationManager
+    // For notifying service is running in background
     private lateinit var notificationManager: NotificationManager
 
+    // For stats tracking
     private var currentLocation: LatLng? = null
     private var prevLocation: LatLng? = null
     private var distance = 0.0
@@ -59,37 +66,47 @@ class TrackingService : Service(), LocationListener {
     private var calories = 0.0
 
     override fun onCreate() {
+        Log.d(TAG, "onCreate() called")
         super.onCreate()
         trackingBinder = TrackingBinder()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        showNotification()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG,"onStartCommand() called")
         startLocationUpdates()
+        showNotification()
         return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        Log.d(TAG,"onBind() called")
         return trackingBinder
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        Log.d(TAG, "onUnbind(() called")
         msgHandler = null
         return true
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy() called")
         super.onDestroy()
         cleanupService()
     }
 
+    // Helper method
+    // Stops receiving location updates and clears the service notification
     private fun cleanupService (){
         locationManager.removeUpdates(this)
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
+
+    // Helper method that shows notification in phone's notification bar
+    // Code entirely taken from lecture demos (BindDemoKotlin)
     private fun showNotification() {
         val intent = Intent(this, MapDisplayActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -122,7 +139,11 @@ class TrackingService : Service(), LocationListener {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
+    // This helper method checks if location permissions are granted
+    // If yes, it requests for location updates from location manager
+    // Upon getting location updates, it calls onLocationChanged() method
     private fun startLocationUpdates() {
+        // Permission verification
         if (ActivityCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -136,6 +157,8 @@ class TrackingService : Service(), LocationListener {
             return
         }
 
+        // Request for location updates
+        // Code adapted from lecture demos (I_am_here_map_Kotlin)
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             try {
                 locationManager.requestLocationUpdates(
@@ -153,6 +176,7 @@ class TrackingService : Service(), LocationListener {
         try {
             val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
+            // The 2 sec check ensures location is very recent
             if (lastLocation != null && System.currentTimeMillis() - lastLocation.time < 2000) {
                 onLocationChanged(lastLocation)
             }
@@ -161,19 +185,56 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // When new location is detected, this helper method computes the necessary stats like
+    // distance, average speed, current speed, calories etc. and sends messages to the client.
     override fun onLocationChanged(location: Location) {
+
         currentLocation = LatLng(location.latitude, location.longitude)
         updateActivityStats()
 
         if (msgHandler != null) {
             sendLocationUpdate(currentLocation!!)
-            sendCurrentSpeedUpdate(location.speed * 3.6)
+            sendCurrentSpeedUpdate(location.speed * 3.6) // location.speed is in m/s. * 3.6 converts it to km/hr
             sendDistanceUpdate(distance)
             sendAverageSpeedUpdate(avgSpeed)
             sendCalorieUpdate(calories)
         }
     }
 
+    // Computes and updates tracking statistics (distance, speed, calories).
+    //
+    // GPS Stabilization: Stats calculation begins after a 2-second delay to mitigate GPS
+    // initialization errors. Initial GPS readings can have positional inaccuracies of several
+    // meters, which would produce artificially inflated speed values when divided by near-zero
+    // elapsed time. The delay allows the GPS signal to stabilize.
+    //
+    // Calculation Methods:
+    // - Distance: Cumulative sum of great-circle distances between consecutive location points
+    //   using SphericalUtil.computeDistanceBetween()
+    //   Reference: https://www.geeksforgeeks.org/android/how-to-calculate-distance-between-two-locations-in-android/
+    // - Average Speed: (Total Distance / Total Time) × 3600 (converted to km/h)
+    // - Calories: Distance (km) × 60 (simplified estimate; can be improved if required using more metrics like
+    //   activity type, speed, user weight etc.)
+    private fun updateActivityStats() {
+
+        if (startTime == 0L) {
+            startTime = System.currentTimeMillis()
+        }
+        val totalTimeSec = (System.currentTimeMillis() - startTime) / 1000.0
+
+        if (totalTimeSec < 2) return
+
+        if (prevLocation != null) {
+            val deltaDist = SphericalUtil.computeDistanceBetween(prevLocation, currentLocation) / 1000.0
+            distance += deltaDist
+            avgSpeed = (distance / totalTimeSec) * 3600.0
+            calories += deltaDist * 60
+        }
+        prevLocation = currentLocation
+    }
+
+    // Sends location updates to the bound service
+    // Code adapted from lecture demos (BindDemoKotlin)
     private fun sendLocationUpdate(location: LatLng) {
         msgHandler?.let { handler ->
             val bundle = Bundle().apply {
@@ -188,6 +249,8 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // Sends distance updates to the bound service
+    // Code adapted from lecture demos (BindDemoKotlin)
     private fun sendDistanceUpdate(distance: Double) {
         msgHandler?.let { handler ->
             val bundle = Bundle().apply {
@@ -201,6 +264,8 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // Sends current speed updates to the bound service
+    // Code adapted from lecture demos (BindDemoKotlin)
     private fun sendCurrentSpeedUpdate(speed: Double) {
         msgHandler?.let { handler ->
             val bundle = Bundle().apply {
@@ -214,6 +279,8 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // Sends average updates to the bound service
+    // Code adapted from lecture demos (BindDemoKotlin)
     private fun sendAverageSpeedUpdate(speed: Double) {
         msgHandler?.let { handler ->
             val bundle = Bundle().apply {
@@ -227,6 +294,8 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // Sends calorie updates to the bound service
+    // Code adapted from lecture demos (BindDemoKotlin)
     private fun sendCalorieUpdate(calories: Double) {
         msgHandler?.let { handler ->
             val bundle = Bundle().apply {
@@ -240,23 +309,8 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
-    private fun updateActivityStats() {
-        if (startTime == 0L) {
-            startTime = System.currentTimeMillis()
-        }
-        val totalTimeSec = (System.currentTimeMillis() - startTime) / 1000.0
-
-        if (totalTimeSec < 2) return
-
-        if (prevLocation != null) {
-            val deltaDist = SphericalUtil.computeDistanceBetween(prevLocation, currentLocation) / 1000.0
-            distance += deltaDist
-            avgSpeed = (distance / totalTimeSec) * 3600.0
-            calories += deltaDist * 50
-        }
-        prevLocation = currentLocation
-    }
-
+    // Binder class that provides the interface for clients to communicate with this service.
+    // Allows the bound entity to set a Handler for receiving tracking updates.
     inner class TrackingBinder : Binder() {
         fun setMsgHandler(handler: Handler) {
             this@TrackingService.msgHandler = handler

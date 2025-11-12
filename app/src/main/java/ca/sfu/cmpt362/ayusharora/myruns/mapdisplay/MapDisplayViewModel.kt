@@ -13,16 +13,13 @@ import com.google.android.gms.maps.model.LatLng
 
 class MapDisplayViewModel : ViewModel(), ServiceConnection {
 
+    // Handles messages (updates) coming from service
     private var myMessageHandler: MyMessageHandler = MyMessageHandler(Looper.getMainLooper())
 
+    // To record activity duration
     var startTimeMillis: Long = 0L
 
-    fun initializeStartTime() {
-        if (startTimeMillis == 0L) {
-            startTimeMillis = System.currentTimeMillis()
-        }
-    }
-
+    // Live Data for activity stats
     private val _currentLocation = MutableLiveData<LatLng>()
     val currentLocation: LiveData<LatLng>
         get() = _currentLocation
@@ -43,16 +40,28 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
     val calories: LiveData<Double>
         get() = _calories
 
+    // Code adapted from lecture demos
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
 
         val tempBinder = iBinder as TrackingService.TrackingBinder
         tempBinder.setMsgHandler(myMessageHandler)
     }
 
+    // Code adapted from lecture demos
     override fun onServiceDisconnected(name: ComponentName?) {
         myMessageHandler.removeCallbacksAndMessages(null)
     }
 
+    // Helper method to initialize start time
+    fun initializeStartTime(){
+        if (startTimeMillis == 0L){
+            startTimeMillis = System.currentTimeMillis()
+        }
+    }
+
+    // Inner message handling class following a custom designed messaging protocol
+    // It interprets the messages sent by the connected service and triggers the live data accordingly
+    // Code is adapted from lecture demos
     inner class MyMessageHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message) {
             val bundle = msg.data
