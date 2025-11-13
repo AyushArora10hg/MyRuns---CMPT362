@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.userprofile
+package ca.sfu.cmpt362.ayusharora.myruns.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog

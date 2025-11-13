@@ -1,4 +1,4 @@
-package ca.sfu.cmpt362.ayusharora.myruns.manualinput
+package ca.sfu.cmpt362.ayusharora.myruns.dialogs
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
@@ -78,7 +78,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     }
 
     // returns a datePicker Dialog
-    private fun createDatePickerDialog() : Dialog{
+    private fun createDatePickerDialog() : Dialog {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = arguments?.getLong(CALENDAR)!!
         val dialog = DatePickerDialog(
@@ -92,7 +92,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
     }
 
     // returns a timePickerDialog
-    private fun createTimePickerDialog() : Dialog{
+    private fun createTimePickerDialog() : Dialog {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = arguments?.getLong(CALENDAR)!!
         val dialog = TimePickerDialog(
@@ -107,7 +107,7 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
 
     // returns a dialog taking user input
     // handles the arguments sent to this fragment and create a customized dialog based on them
-    private fun createUserInputDialog() : Dialog{
+    private fun createUserInputDialog() : Dialog {
         val view = requireActivity().layoutInflater.inflate(R.layout.fragment_input_dialog, null)
         editText = view.findViewById(R.id.id_edittext)
 
@@ -130,7 +130,11 @@ class InputDialogFragment : DialogFragment(), DialogInterface.OnClickListener, D
         }
         val builder = AlertDialog.Builder(requireActivity())
         builder.setView(view)
-        builder.setTitle("$title $unit")
+        if (title != null && unit != null){
+            builder.setTitle("$title $unit")
+        } else if (title != null){
+            builder.setTitle(title)
+        }
         builder.setPositiveButton("Save", this)
         builder.setNegativeButton("Cancel", this)
 

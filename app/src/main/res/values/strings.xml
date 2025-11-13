@@ -43,4 +43,5 @@
     <string name="md_tv_stats_calories">Calories:</string>
     <string name="md_tv_stats_distance">Distance:</string>
     <string name="button_delete_all">DELETE ALL ENTRIES</string>
+    <string name="md_tv_stats_comments">Comments</string>
 </resources>

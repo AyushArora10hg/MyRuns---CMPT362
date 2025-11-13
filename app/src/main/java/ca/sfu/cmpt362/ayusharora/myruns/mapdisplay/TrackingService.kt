@@ -104,7 +104,6 @@ class TrackingService : Service(), LocationListener {
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
-
     // Helper method that shows notification in phone's notification bar
     // Code entirely taken from lecture demos (BindDemoKotlin)
     private fun showNotification() {

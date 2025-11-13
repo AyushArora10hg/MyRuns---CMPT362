@@ -17,7 +17,8 @@ import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.manualinput.InputDialogFragment
+import ca.sfu.cmpt362.ayusharora.myruns.dialogs.InputDialogFragment
+import ca.sfu.cmpt362.ayusharora.myruns.dialogs.OptionDialogFragment
 import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {

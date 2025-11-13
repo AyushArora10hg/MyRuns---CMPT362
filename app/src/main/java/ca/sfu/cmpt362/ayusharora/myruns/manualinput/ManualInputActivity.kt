@@ -16,6 +16,7 @@ import ca.sfu.cmpt362.ayusharora.myruns.WorkoutFormatter
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
+import ca.sfu.cmpt362.ayusharora.myruns.dialogs.InputDialogFragment
 import java.util.Calendar
 
 class ManualInputActivity : AppCompatActivity() {

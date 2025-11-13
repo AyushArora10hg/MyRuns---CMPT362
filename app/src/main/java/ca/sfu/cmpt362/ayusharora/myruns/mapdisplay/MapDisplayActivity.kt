@@ -2,6 +2,7 @@ package ca.sfu.cmpt362.ayusharora.myruns.mapdisplay
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -15,6 +16,7 @@ import ca.sfu.cmpt362.ayusharora.myruns.database.ExerciseEntry
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutDatabase
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutRepository
 import ca.sfu.cmpt362.ayusharora.myruns.database.WorkoutViewModel
+import ca.sfu.cmpt362.ayusharora.myruns.dialogs.InputDialogFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -48,6 +50,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var avgSpeedTextView: TextView
     private lateinit var calorieTextView: TextView
     private lateinit var climbTextView: TextView
+    private lateinit var commentsTextView: TextView
 
     // To save to and load from database
     private lateinit var workoutViewModel: WorkoutViewModel
@@ -65,6 +68,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
     private var startPlaced = false
+    private var dialogShown = false
 
     // History mode only variables
     private lateinit var historyEntry: ExerciseEntry
@@ -92,6 +96,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         avgSpeedTextView = findViewById(R.id.md_stats_average_speed)
         calorieTextView = findViewById(R.id.md_stats_calories)
         climbTextView = findViewById(R.id.md_stats_climb)
+        commentsTextView = findViewById(R.id.md_stats_comments)
 
         saveButton = findViewById(R.id.md_button_save)
         cancelButton = findViewById(R.id.md_button_cancel)
@@ -201,7 +206,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Puts the activity into tracking mode
     // It initializes a MapDisplayViewModel instance for LiveData tracking from service
-    // It overrides listeners of Save and Cancel buttons and hides the Delete button.
+    // It overrides listeners of Save and Cancel buttons
+    // It hides Comments Text View and Delete button as they are not required in this view
     // Uses WorkoutViewModel to have database access
     private fun launchTrackingMode() {
 
@@ -209,6 +215,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         mapDisplayViewModel.initializeStartTime()
 
         deleteButton.visibility = View.GONE
+        commentsTextView.visibility = View.GONE
         handleSaveAndCancelButtons()
 
         workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
@@ -340,7 +347,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // Stops the tracking service, unbinds it from the activity
-    private fun stopTrackingAndFinish() {
+    private fun stopTracking() {
 
         if (isBound) {
             unbindService(mapDisplayViewModel)
@@ -349,7 +356,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val serviceIntent = Intent(this, TrackingService::class.java)
         stopService(serviceIntent)
-        finish()
     }
 
     // Helper method to handle the Save and Cancel button clicks:
@@ -357,24 +363,48 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     // - Cancel: Discards the recording and exits without saving
     private fun handleSaveAndCancelButtons() {
         saveButton.setOnClickListener {
-
             if (workoutViewModel.entry.locationList.isEmpty()){
                 Toast.makeText(this, "No Route to Save!", Toast.LENGTH_SHORT).show()
-                stopTrackingAndFinish()
+                stopTracking()
+                finish()
             } else {
-                mapDisplayViewModel.let { viewModel ->
-                    val duration = (System.currentTimeMillis() - viewModel.startTimeMillis) / 60000.0
-                    workoutViewModel.entry.duration = duration
+                val duration = (System.currentTimeMillis() - mapDisplayViewModel.startTimeMillis) / 60000.0
+                workoutViewModel.entry.duration = duration
+                if (!dialogShown){
+                    showCommentsDialog()
+                    dialogShown = true
+                    supportFragmentManager.setFragmentResultListener("input_comments", this) { _, bundle ->
+                        val value = bundle.getString("user_input")
+                        workoutViewModel.entry.comment = value ?: ""
+                    }
+                    stopTracking()
+                }
+                else {
                     workoutViewModel.insert()
                     shouldShowToast = true
-                    stopTrackingAndFinish()
+                    stopTracking()
+                    finish()
                 }
             }
         }
 
         cancelButton.setOnClickListener {
-            stopTrackingAndFinish()
+            stopTracking()
+            finish()
         }
+    }
+
+    // Helper method that prompts a dialog asking for user comments
+    private fun showCommentsDialog(){
+        val dialog = InputDialogFragment()
+        val args = Bundle()
+        args.putInt(InputDialogFragment.DIALOG_TYPE_KEY, InputDialogFragment.TYPE_INPUT)
+        args.putString(InputDialogFragment.TITLE_KEY, "Comments")
+        args.putInt(InputDialogFragment.INPUT_TYPE_KEY, InputType.TYPE_CLASS_TEXT)
+        args.putString(InputDialogFragment.HINT_KEY, "How did your workout go?")
+        dialog.arguments = args
+        dialog.show(supportFragmentManager, "commentsDialog")
+
     }
 
     // ******************************** HISTORY MODE ******************************************* //
@@ -386,6 +416,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         saveButton.visibility = View.GONE
         cancelButton.visibility = View.GONE
+        curSpeedTextView.visibility = View.GONE
         handleDeleteButton()
 
         val pos = intent.getIntExtra(ENTRY_POSITION, -1)
@@ -413,9 +444,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             append("Distance: ")
             append(WorkoutFormatter.distance)
         }
-        curSpeedTextView.text = buildString {
-            append("Current Speed: N/A")
-        }
         avgSpeedTextView.text = buildString {
             append("Average Speed: ")
             append(WorkoutFormatter.avgSpeed)
@@ -427,6 +455,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         climbTextView.text = buildString {
             append("Climb: ")
             append(WorkoutFormatter.climb)
+        }
+        commentsTextView.text = buildString {
+            append("Comments: ")
+            append(WorkoutFormatter.comment)
         }
 
         if (::mMap.isInitialized) {

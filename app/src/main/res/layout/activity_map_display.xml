@@ -45,8 +45,6 @@
         android:layout_below="@+id/app_bar"
         tools:context=".mapdisplay.MapDisplayActivity" />
 
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,6 +99,15 @@
             android:layout_weight="1"
             android:text="@string/md_tv_stats_distance"
             android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/md_stats_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/md_tv_stats_comments"
+            android:textSize="18sp"/>
+
     </LinearLayout>
 
     <LinearLayout
