@@ -308,6 +308,14 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
+    // If the app is closed, this method kills the service running in background
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.d(TAG, "App removed from recent tasks - stopping service")
+        cleanupService()
+        stopSelf()
+    }
+
     // Binder class that provides the interface for clients to communicate with this service.
     // Allows the bound entity to set a Handler for receiving tracking updates.
     inner class TrackingBinder : Binder() {

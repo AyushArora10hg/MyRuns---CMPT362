@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.cmpt362.ayusharora.myruns.R
@@ -85,6 +86,13 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         when (mode) {
             MODE_TRACKING -> launchTrackingMode()
             MODE_HISTORY -> launchHistoryMode()
+        }
+
+        onBackPressedDispatcher.addCallback(this) {
+            if (mode == MODE_TRACKING) {
+                stopTracking()
+            }
+            finish()
         }
     }
 
@@ -195,12 +203,10 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     // is not killed during changes like screen rotation or app going to background
     override fun onDestroy() {
         super.onDestroy()
-
-        if (isBound && mode == MODE_TRACKING) {
-            unbindService(mapDisplayViewModel)
-            isBound = false
-        }
+        stopTracking()
     }
+
+
 
     // ******************************** TRACKING MODE ****************************************** //
 
@@ -365,7 +371,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         saveButton.setOnClickListener {
             if (workoutViewModel.entry.locationList.isEmpty()){
                 Toast.makeText(this, "No Route to Save!", Toast.LENGTH_SHORT).show()
-                stopTracking()
                 finish()
             } else {
                 val duration = (System.currentTimeMillis() - mapDisplayViewModel.startTimeMillis) / 60000.0
@@ -382,14 +387,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
                 else {
                     workoutViewModel.insert()
                     shouldShowToast = true
-                    stopTracking()
                     finish()
                 }
             }
         }
 
         cancelButton.setOnClickListener {
-            stopTracking()
             finish()
         }
     }
