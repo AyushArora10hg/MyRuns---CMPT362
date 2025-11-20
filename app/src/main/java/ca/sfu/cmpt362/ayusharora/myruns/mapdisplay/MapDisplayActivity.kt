@@ -173,32 +173,19 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         if (workoutViewModel.entry.locationList.isEmpty()) return
 
         startMarker?.remove()
+        startMarker = placeStartMarker(workoutViewModel.entry.locationList.first())
+        startPlaced = true
+
         endMarker?.remove()
         polyline?.remove()
 
-        startMarker = mMap.addMarker(
-            MarkerOptions()
-                .position(workoutViewModel.entry.locationList.first())
-                .title("Start")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        )
-        startPlaced = true
-
         if (workoutViewModel.entry.locationList.size > 1) {
-            endMarker = mMap.addMarker(
-                MarkerOptions()
-                    .position(workoutViewModel.entry.locationList.last())
-                    .title("Current")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            )
-
-            polyline = mMap.addPolyline(
-                PolylineOptions()
-                    .addAll(workoutViewModel.entry.locationList)
-                    .color(android.graphics.Color.BLACK)
-                    .width(10f)
-            )
+            endMarker = placeEndMarker(workoutViewModel.entry.locationList.last())
+            updatePolyline(workoutViewModel.entry.locationList)
         }
+
+
+
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(workoutViewModel.entry.locationList.last(), 17f))
     }
@@ -217,6 +204,38 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             val serviceIntent = Intent(this, TrackingService::class.java)
             stopService(serviceIntent)
         }
+    }
+
+    private fun placeStartMarker (location: LatLng): Marker{
+        val marker = mMap.addMarker(
+            MarkerOptions()
+                .position(location)
+                .title("Start")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
+        return marker!!
+    }
+
+    private fun placeEndMarker (location: LatLng): Marker {
+        val marker = mMap.addMarker(
+            MarkerOptions()
+                .position(location)
+                .title("End")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        )
+        return marker!!
+    }
+
+    // Refreshes the route polyline by redrawing all recorded points.
+    // Called each time a new location update arrives.
+    private fun updatePolyline(locationList: ArrayList<LatLng>) {
+
+        polyline = mMap.addPolyline(
+            PolylineOptions()
+                .addAll(locationList)
+                .color(android.graphics.Color.BLACK)
+                .width(10f)
+        )
     }
 
     // ******************************** TRACKING MODE ****************************************** //
@@ -253,14 +272,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     // binds this activity to receive updates via the MapDisplayViewModel
     private fun startTrackingService() {
 
-        mapDisplayViewModel.let { viewModel ->
-            val serviceIntent = Intent(this, TrackingService::class.java).apply {
-                putExtra(INPUT_TYPE, inputType)
-            }
-            startService(serviceIntent)
-            bindService(serviceIntent, viewModel, BIND_AUTO_CREATE)
-            isBound = true
+        val serviceIntent = Intent(this, TrackingService::class.java).apply {
+            putExtra(INPUT_TYPE, inputType)
         }
+        startService(serviceIntent)
+        bindService(serviceIntent, mapDisplayViewModel, BIND_AUTO_CREATE)
+        isBound = true
     }
 
     // Observes LiveData in the MapDisplayViewModel and updates its UI
@@ -270,62 +287,59 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
         WorkoutFormatter.initialize(this, workoutViewModel.entry)
 
-        mapDisplayViewModel.let { viewModel ->
 
             // In AUTOMATIC mode, observe detected activity type
-            if (inputType == INPUT_TYPE_AUTOMATIC) {
-                typeTextView.text = "Type: Detecting..."
-
-                viewModel.detectedActivityType.observe(this) { activityType ->
-                    workoutViewModel.entry.activityType = activityType
-                    WorkoutFormatter.initialize(this, workoutViewModel.entry)
-                    typeTextView.text = buildString {
-                        append("Type: ")
-                        append(WorkoutFormatter.activityType)
-                    }
-                }
-            } else {
-                // GPS mode - use user-selected activity type
+        if (inputType == INPUT_TYPE_AUTOMATIC) {
+            typeTextView.text = "Type: Detecting..."
+            mapDisplayViewModel.detectedActivityType.observe(this) { activityType ->
+                workoutViewModel.entry.activityType = activityType
+                WorkoutFormatter.initialize(this, workoutViewModel.entry)
                 typeTextView.text = buildString {
                     append("Type: ")
                     append(WorkoutFormatter.activityType)
                 }
             }
-
-            viewModel.currentLocation.observe(this) { location ->
-                workoutViewModel.entry.locationList.add(location)
-                updateMapWithCurrentLocation(location)
+        } else {
+            // GPS mode - use user-selected activity type
+            typeTextView.text = buildString {
+                append("Type: ")
+                append(WorkoutFormatter.activityType)
             }
+        }
 
-            viewModel.distance.observe(this) { d ->
-                workoutViewModel.entry.distance = d
-                distanceTextView.text = buildString {
-                    append("Distance: ")
-                    append(WorkoutFormatter.distance)
-                }
+        mapDisplayViewModel.currentLocation.observe(this) { location ->
+            workoutViewModel.entry.locationList.add(location)
+            updateMapWithCurrentLocation(location)
+        }
+
+        mapDisplayViewModel.distance.observe(this) { d ->
+            workoutViewModel.entry.distance = d
+            distanceTextView.text = buildString {
+                append("Distance: ")
+                append(WorkoutFormatter.distance)
             }
+        }
 
-            viewModel.curSpeed.observe(this) { speed ->
-                curSpeedTextView.text = buildString {
-                    append("Current Speed: ")
-                    append(WorkoutFormatter.convertSpeedForDisplay(speed))
-                }
+        mapDisplayViewModel.curSpeed.observe(this) { speed ->
+            curSpeedTextView.text = buildString {
+                append("Current Speed: ")
+                append(WorkoutFormatter.convertSpeedForDisplay(speed))
             }
+        }
 
-            viewModel.avgSpeed.observe(this) { s ->
-                workoutViewModel.entry.avgSpeed = s
-                avgSpeedTextView.text = buildString {
-                    append("Average Speed: ")
-                    append(WorkoutFormatter.avgSpeed)
-                }
+        mapDisplayViewModel.avgSpeed.observe(this) { s ->
+            workoutViewModel.entry.avgSpeed = s
+            avgSpeedTextView.text = buildString {
+                append("Average Speed: ")
+                append(WorkoutFormatter.avgSpeed)
             }
+        }
 
-            viewModel.calories.observe(this) { cal ->
-                workoutViewModel.entry.calorie = cal
-                calorieTextView.text = buildString {
-                    append("Calories: ")
-                    append(WorkoutFormatter.calories)
-                }
+        mapDisplayViewModel.calories.observe(this) { cal ->
+            workoutViewModel.entry.calorie = cal
+            calorieTextView.text = buildString {
+                append("Calories: ")
+                append(WorkoutFormatter.calories)
             }
         }
     }
@@ -343,39 +357,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         if (!startPlaced) {
-            startMarker = mMap.addMarker(
-                MarkerOptions()
-                    .position(location)
-                    .title("Start")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            )
+            startMarker = placeStartMarker(location)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
             startPlaced = true
         } else {
             endMarker?.remove()
-            endMarker = mMap.addMarker(
-                MarkerOptions()
-                    .position(location)
-                    .title("Current")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            )
+            endMarker = placeEndMarker(location)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17f))
-            updatePolyline()
+            updatePolyline(workoutViewModel.entry.locationList)
         }
 
-    }
-
-    // Refreshes the route polyline by redrawing all recorded points.
-    // Called each time a new location update arrives.
-    private fun updatePolyline() {
-        polyline?.remove()
-
-        polyline = mMap.addPolyline(
-            PolylineOptions()
-                .addAll(workoutViewModel.entry.locationList)
-                .color(android.graphics.Color.BLACK)
-                .width(10f)
-        )
     }
 
     // Stops the tracking service, unbinds it from the activity
@@ -496,27 +487,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun displayActivityTrace() {
         if (historyEntry.locationList.isEmpty()) return
 
-        startMarker = mMap.addMarker(
-            MarkerOptions()
-                .position(historyEntry.locationList.first())
-                .title("Start")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        )
+        startMarker = placeStartMarker(historyEntry.locationList.first())
 
         if (historyEntry.locationList.size > 1) {
-            endMarker = mMap.addMarker(
-                MarkerOptions()
-                    .position(historyEntry.locationList.last())
-                    .title("End")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            )
+            endMarker = placeEndMarker(historyEntry.locationList.last())
 
-            polyline = mMap.addPolyline(
-                PolylineOptions()
-                    .addAll(historyEntry.locationList)
-                    .color(android.graphics.Color.BLACK)
-                    .width(10f)
-            )
+            updatePolyline(historyEntry.locationList)
         }
 
         centerMapOnRoute(historyEntry.locationList)

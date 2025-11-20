@@ -102,7 +102,7 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
         0 to 0, // Standing
         1 to 0, // Walking
         2 to 0, // Running
-        3 to 0  // Other
+        3 to 0 // Other
     )
     private var totalClassifications = 0
     private var detectedActivityType = -1
@@ -377,9 +377,8 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
     // Code adapted from lecture demos (ShakeSensorKotlin)
     private fun startActivityRecognition() {
 
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         if (accelerometer == null) {
-            Log.e(TAG, "Accelerometer not available!")
             return
         }
         sensorManager.registerListener(
@@ -403,13 +402,17 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
 
     // Called when accelerometer data is received
     // Code adapted from lecture demos (ShakeSensorKotlin and MyRunsDataCollectorKotlin)
+    // Note: I have used Sensor.TYPE_LINEAR_ACCELERATION instead of sensor.TYPE_ACCELEROMETER
+    // because the data collector app used the former to collect training data. The Weka model
+    // was trained with that sensor so, using a different type of sensor for testing was not giving
+    // very accurate results
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
-            val m = sqrt(
-                (event.values[0] * event.values[0] +
-                        event.values[1] * event.values[1] +
-                        event.values[2] * event.values[2]).toDouble()
-            )
+        if (event?.sensor?.type == Sensor.TYPE_LINEAR_ACCELERATION) {
+
+            val x = (event.values[0]).toDouble()
+            val y = (event.values[1]).toDouble()
+            val z = (event.values[2]).toDouble()
+            val m = sqrt((x * x + y * y + z * z))
 
             try {
                 mAccBuffer.add(m)
@@ -439,20 +442,15 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
 
                     val featureVector = extractFeatures(accBlock, im)
                     val predictedActivity = classifyActivity(featureVector)
-                    Log.d(TAG, "Classification complete: $predictedActivity")
 
                     activityCounts[predictedActivity] = (activityCounts[predictedActivity] ?: 0) + 1
                     totalClassifications++
-
                     val majorityActivity = activityCounts.maxByOrNull { it.value }?.key ?: 0
                     if (detectedActivityType == -1 || majorityActivity != detectedActivityType) {
-                        Log.d(TAG, "Activity changed from $detectedActivityType to $majorityActivity (counts: $activityCounts)")
                         detectedActivityType = majorityActivity
                         withContext(Dispatchers.Main) {
                             onActivityDetected(detectedActivityType)
                         }
-                    } else {
-                        Log.d(TAG, "Majority activity unchanged: $majorityActivity (counts: $activityCounts)")
                     }
                 }
 
@@ -466,6 +464,7 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
     // Code is the modified version from demo (MyRunsDataCollector)
     private fun extractFeatures(accBlock: DoubleArray, im: DoubleArray): DoubleArray {
         val features = DoubleArray(FEATURE_VECTOR_SIZE)
+
         var max = Double.MIN_VALUE
         for (value in accBlock) {
             if (max < value) {
@@ -475,6 +474,7 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
 
         val fft = FFT(ACCELEROMETER_BLOCK_CAPACITY)
         fft.fft(accBlock, im)
+
         for (i in 0 until ACCELEROMETER_BLOCK_CAPACITY) {
             val magnitude = sqrt(accBlock[i] * accBlock[i] + im[i] * im[i])
             features[i] = magnitude
@@ -525,13 +525,11 @@ class TrackingService : Service(), LocationListener, SensorEventListener {
     // This method is called when activity is classified
     // It updates the detected activity type and notifies the activity
     private fun onActivityDetected(activityType: Int) {
-        Log.d(TAG, "onActivityDetected called with type: $activityType")
         detectedActivityType = activityType
 
         if (msgHandler == null) {
             return
         }
-        Log.d(TAG, "Sending activity type update: $activityType")
         sendActivityTypeUpdate(activityType)
     }
 

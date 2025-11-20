@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import ca.sfu.cmpt362.ayusharora.myruns.R
-import ca.sfu.cmpt362.ayusharora.myruns.displayentry.DisplayEntryActivity
 import ca.sfu.cmpt362.ayusharora.myruns.manualinput.ManualInputActivity
 import ca.sfu.cmpt362.ayusharora.myruns.mapdisplay.MapDisplayActivity
 

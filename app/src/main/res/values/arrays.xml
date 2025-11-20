@@ -23,10 +23,10 @@
     </string-array>
 
     <string-array name="activity_type">
-        <item>Other</item>
-        <item>Running</item>
-        <item>Walking</item>
         <item>Standing</item>
+        <item>Walking</item>
+        <item>Running</item>
+        <item>Other</item>
         <item>Cycling</item>
         <item>Hiking</item>
         <item>Downhill Skiing</item>
