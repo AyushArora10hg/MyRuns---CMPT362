@@ -77,14 +77,6 @@
             android:textSize="18sp"/>
 
         <TextView
-            android:id="@+id/md_stats_climb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/md_tv_stats_climb"
-            android:textSize="18sp" />
-
-        <TextView
             android:id="@+id/md_stats_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

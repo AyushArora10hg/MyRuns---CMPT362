@@ -39,10 +39,15 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         const val ACTIVITY_TYPE = "activity_type"
         const val MODE_TRACKING = 0
         const val MODE_HISTORY = 1
+
+        // Input Types
+        const val INPUT_TYPE_GPS = 1
+        const val INPUT_TYPE_AUTOMATIC = 2
     }
 
     // Mode Tracking
     private var mode = MODE_TRACKING
+    private var inputType = INPUT_TYPE_GPS // Default to GPS
 
     // Display TextViews : Common to both modes
     private lateinit var typeTextView: TextView
@@ -50,7 +55,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var curSpeedTextView: TextView
     private lateinit var avgSpeedTextView: TextView
     private lateinit var calorieTextView: TextView
-    private lateinit var climbTextView: TextView
     private lateinit var commentsTextView: TextView
 
     // To save to and load from database
@@ -80,6 +84,8 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map_display)
 
         mode = intent.getIntExtra(MODE, MODE_TRACKING)
+        inputType = intent.getIntExtra(INPUT_TYPE, INPUT_TYPE_GPS)
+
         initializeViews()
         loadDatabase()
         showGoogleMap()
@@ -103,7 +109,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         curSpeedTextView = findViewById(R.id.md_stats_current_speed)
         avgSpeedTextView = findViewById(R.id.md_stats_average_speed)
         calorieTextView = findViewById(R.id.md_stats_calories)
-        climbTextView = findViewById(R.id.md_stats_climb)
         commentsTextView = findViewById(R.id.md_stats_comments)
 
         saveButton = findViewById(R.id.md_button_save)
@@ -203,10 +208,16 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     // is not killed during changes like screen rotation or app going to background
     override fun onDestroy() {
         super.onDestroy()
-        stopTracking()
+        if (isBound) {
+            unbindService(mapDisplayViewModel)
+            isBound = false
+        }
+
+        if (isFinishing) {
+            val serviceIntent = Intent(this, TrackingService::class.java)
+            stopService(serviceIntent)
+        }
     }
-
-
 
     // ******************************** TRACKING MODE ****************************************** //
 
@@ -224,8 +235,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         commentsTextView.visibility = View.GONE
         handleSaveAndCancelButtons()
 
-        workoutViewModel.entry.inputType = intent.getIntExtra(INPUT_TYPE, -1)
+        workoutViewModel.entry.inputType = inputType
         workoutViewModel.entry.activityType = intent.getIntExtra(ACTIVITY_TYPE, -1)
+
         workoutViewModel.allWorkouts.observe(this) { workouts ->
             if (shouldShowToast && workouts.isNotEmpty()) {
                 Toast.makeText(this, "Entry #${workouts.last().id} saved!", Toast.LENGTH_SHORT).show()
@@ -242,7 +254,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun startTrackingService() {
 
         mapDisplayViewModel.let { viewModel ->
-            val serviceIntent = Intent(this, TrackingService::class.java)
+            val serviceIntent = Intent(this, TrackingService::class.java).apply {
+                putExtra(INPUT_TYPE, inputType)
+            }
             startService(serviceIntent)
             bindService(serviceIntent, viewModel, BIND_AUTO_CREATE)
             isBound = true
@@ -257,13 +271,25 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         WorkoutFormatter.initialize(this, workoutViewModel.entry)
 
         mapDisplayViewModel.let { viewModel ->
-            typeTextView.text = buildString {
-                append("Type: ")
-                append(WorkoutFormatter.activityType)
-            }
-            climbTextView.text = buildString {
-                append("Climb: ")
-                append(WorkoutFormatter.climb)
+
+            // In AUTOMATIC mode, observe detected activity type
+            if (inputType == INPUT_TYPE_AUTOMATIC) {
+                typeTextView.text = "Type: Detecting..."
+
+                viewModel.detectedActivityType.observe(this) { activityType ->
+                    workoutViewModel.entry.activityType = activityType
+                    WorkoutFormatter.initialize(this, workoutViewModel.entry)
+                    typeTextView.text = buildString {
+                        append("Type: ")
+                        append(WorkoutFormatter.activityType)
+                    }
+                }
+            } else {
+                // GPS mode - use user-selected activity type
+                typeTextView.text = buildString {
+                    append("Type: ")
+                    append(WorkoutFormatter.activityType)
+                }
             }
 
             viewModel.currentLocation.observe(this) { location ->
@@ -306,7 +332,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Helper method to update map elements
     // - Places a green "start" marker if not yet placed
-    // - Moves the red “current” marker
+    // - Moves the red "current" marker
     // - Updates the route polyline
     // - Keeps the camera centered on the latest position
     // Code adapted from lecture demos (I_am_here_map_Kotlin)
@@ -454,10 +480,6 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         calorieTextView.text = buildString {
             append("Calories: ")
             append(WorkoutFormatter.calories)
-        }
-        climbTextView.text = buildString {
-            append("Climb: ")
-            append(WorkoutFormatter.climb)
         }
         commentsTextView.text = buildString {
             append("Comments: ")

@@ -69,13 +69,18 @@ class StartFragment : Fragment() {
                     startActivity(intent)
 
                 }
-                1, 2->{
+                1->{
                     val intent = Intent(requireContext(), MapDisplayActivity::class.java)
                     intent.putExtra(MapDisplayActivity.MODE, MapDisplayActivity.MODE_TRACKING)
-                    intent.putExtra(MapDisplayActivity.INPUT_TYPE, pos)
+                    intent.putExtra(MapDisplayActivity.INPUT_TYPE, MapDisplayActivity.INPUT_TYPE_GPS)
                     intent.putExtra(MapDisplayActivity.ACTIVITY_TYPE, activityTypeSpinner.selectedItemPosition)
                     startActivity(intent)
-
+                }
+                2 ->{
+                    val intent = Intent(requireContext(), MapDisplayActivity::class.java)
+                    intent.putExtra(MapDisplayActivity.MODE, MapDisplayActivity.MODE_TRACKING)
+                    intent.putExtra(MapDisplayActivity.INPUT_TYPE, MapDisplayActivity.INPUT_TYPE_AUTOMATIC)
+                    startActivity(intent)
                 }
             }
         }

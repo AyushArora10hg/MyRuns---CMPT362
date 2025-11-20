@@ -23,6 +23,7 @@
     </string-array>
 
     <string-array name="activity_type">
+        <item>Other</item>
         <item>Running</item>
         <item>Walking</item>
         <item>Standing</item>
@@ -36,7 +37,6 @@
         <item>Mountain Biking</item>
         <item>Wheelchair</item>
         <item>Elliptical</item>
-        <item>Other</item>
     </string-array>
 
     <string-array name="manual_entry_fields">

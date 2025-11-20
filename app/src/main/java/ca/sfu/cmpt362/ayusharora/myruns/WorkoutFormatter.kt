@@ -42,8 +42,6 @@ object WorkoutFormatter {
     val calories: String
         get() = "${this.roundToTwoPlaces(entry.calorie)} kcal"
 
-    val climb: String
-        get() = "$climbVal $distanceUnit"
 
     val heartRate: String
         get() = "${this.roundToTwoPlaces(entry.heartRate)} bpm"
@@ -64,13 +62,6 @@ object WorkoutFormatter {
             roundToTwoPlaces(convertKilometersToMiles(entry.avgSpeed)).toDouble()
         } else {
             roundToTwoPlaces(entry.avgSpeed).toDouble()
-        }
-
-    private val climbVal: Double
-        get() = if (shouldConvert){
-            this.convertKilometersToMiles(entry.climb)
-        } else {
-            entry.climb
         }
 
     // Returns unit strings based on shouldConvert flag

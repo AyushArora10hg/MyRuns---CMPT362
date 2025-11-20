@@ -40,6 +40,10 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
     val calories: LiveData<Double>
         get() = _calories
 
+    private val _detectedActivityType = MutableLiveData<Int>()
+    val detectedActivityType: LiveData<Int>
+        get() = _detectedActivityType
+
     // Code adapted from lecture demos
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
 
@@ -91,6 +95,11 @@ class MapDisplayViewModel : ViewModel(), ServiceConnection {
                 TrackingService.MSG_CALORIE_UPDATE -> {
                     val calories = bundle.getDouble(TrackingService.KEY_CALORIES)
                     _calories.value = calories
+                }
+
+                TrackingService.MSG_ACTIVITY_TYPE_UPDATE -> {
+                    val activityType = bundle.getInt(TrackingService.KEY_ACTIVITY_TYPE)
+                    _detectedActivityType.value = activityType
                 }
             }
         }

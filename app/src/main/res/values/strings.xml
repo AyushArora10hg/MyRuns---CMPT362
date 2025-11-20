@@ -39,7 +39,6 @@
     <string name="md_tv_stats_type">Activity Type:</string>
     <string name="md_tv_stats_average_speed">Average Speed:</string>
     <string name="md_tv_stats_current_speed">Current Speed:</string>
-    <string name="md_tv_stats_climb">Climb:</string>
     <string name="md_tv_stats_calories">Calories:</string>
     <string name="md_tv_stats_distance">Distance:</string>
     <string name="button_delete_all">DELETE ALL ENTRIES</string>

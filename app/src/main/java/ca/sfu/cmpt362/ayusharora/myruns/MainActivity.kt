@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragments: ArrayList<Fragment>
     private lateinit var tabLayoutMediator: TabLayoutMediator
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_main)

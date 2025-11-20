@@ -58,4 +58,5 @@ dependencies {
 
     implementation(libs.play.services.maps)
     implementation("com.google.maps.android:android-maps-utils:0.4+")
+    implementation( files ("libs/weka.jar"))
 }

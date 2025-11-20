@@ -37,9 +37,6 @@ data class ExerciseEntry (
     @ColumnInfo(name = "calories")
     var calorie: Double = 0.0,                                  // Calories burnt
 
-    @ColumnInfo(name = "climb")
-    var climb: Double = 0.0,                                    // Climb. Either in meters or feet.
-
     @ColumnInfo(name = "heart_rate")
     var heartRate: Double = 0.0,                                // Heart rate in bpm
 
