@@ -7,7 +7,7 @@
 
 A comprehensive Android fitness tracking application that captures and displays physical activities using GPS tracking, manual entry, and machine learning-based automatic activity recognition.
 
-[**MyRuns APK**](https://1drv.ms/u/c/931d74c7905f6350/IQCOFYicNJH_QItd6ZWhgI6XAaHU56tAEio1UHPHTz9AHCo?e=xZ8mHe)
+📥 Download APK: [**MyRuns APK**](https://1drv.ms/u/c/931d74c7905f6350/IQCOFYicNJH_QItd6ZWhgI6XAaHU56tAEio1UHPHTz9AHCo?e=xZ8mHe)
 
 ---
 
@@ -60,7 +60,7 @@ MyRuns/
 │   └── WorkoutViewModel (Database view model)
 ├── Dialogs
 │   ├── InputDialogFragment (Dialog for user inputs)
-│   ├── OptionDialogFragment (Dialog for selecting from multiple options)
+│   └── OptionDialogFragment (Dialog for selecting from multiple options)
 ├── DisplayEntry
 │   └── DisplayEntryActivity (Display exercise info from database)
 ├── Main/
